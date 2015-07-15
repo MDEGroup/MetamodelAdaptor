@@ -1,0 +1,91 @@
+// Input : Modello vecchio, Modello differenze generato da EMFCompare
+// Output : Modello conforme al nuovo metamodello
+
+
+
+/*
+	Informazioni sui tipi
+
+tuttiTipi = Sequence(dettagli);
+
+dettagli = Sequence({nome, tipo, cambiamenti});
+
+nome = String; tipo = String;
+
+cambiamenti = Sequence(Diff);
+
+
+*/
+
+pre {
+"$> Avvio trasformazione\n".println();
+var tuttiTipi = new Sequence();
+}
+
+post {
+"$> Elenco cambiamenti completo!".println("\n\n==== FINE ====\n\n");
+}
+
+operation Any cercaTipiSx() {
+	for (a in self)
+	{
+		if (a.left.isDefined()) {
+			var dettagli = new Sequence();
+			
+			dettagli.add(a.left.name);
+			dettagli.add(a.left.type().name);			
+			dettagli.add("genitore"); // da fare
+			dettagli.add(a.differences);
+			
+			tuttiTipi.add(dettagli);
+		}
+			
+			
+		a.submatches.cercaTipiSx();
+	}
+	
+}
+
+
+
+
+rule Test 
+	transform c : Compare!Comparison
+// Per ora vengono specificati i package generali
+// entro cui c'è tutto il resto del modello
+	to t: Any { 
+	
+	"<< Informazioni metamodello e cambiamenti >>".println();
+	var ris = c.matches;
+	ris.cercaTipiSx();
+	
+	for (x in tuttiTipi){		
+		x.at(0).print("\n");
+		x.at(1).print(" @ ");
+		x.at(2).println(" ? ");
+		for (y in x.at(3))
+		{
+			y.value.name.print();
+			if (y.value.type().isDefined())	 
+				y.value.type().name.print(" # ");
+			y.kind.println(" > ");	
+		}
+		
+	}
+	
+	
+	"\n\n<< Informazioni lette nel modello in input >>".println();
+	
+	Source.println("\nTipo: ");
+		
+	var x1 = Source.allInstances();
+		for (k in x1){
+			k.print("\n");				
+			k.type().print(" @ ");			
+		}
+				
+}
+
+
+
+

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="Famiglia" nsURI="univaq.it/famiglia" nsPrefix="famiglia">
+  <eClassifiers xsi:type="ecore:EClass" name="Persona" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nome" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sesso" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EChar"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Padre" eSuperTypes="#//Persona">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
+        eOpposite="#//Famiglia/padre"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Madre" eSuperTypes="#//Persona">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
+        eOpposite="#//Famiglia/madre"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Figlio" eSuperTypes="#//Persona">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
+        eOpposite="#//Famiglia/figli"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Famiglia">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="padre" eType="#//Padre"
+        containment="true" eOpposite="#//Padre/famiglia"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="madre" eType="#//Madre"
+        containment="true" eOpposite="#//Madre/famiglia"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="figli" upperBound="-1"
+        eType="#//Figlio" containment="true" eOpposite="#//Figlio/famiglia"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cognome" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+</ecore:EPackage>
