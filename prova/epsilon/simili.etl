@@ -33,8 +33,10 @@ operation Any cercaTipiSx() {
 			var dettagli = new Sequence();
 			
 			dettagli.add(a.left.name);
-			dettagli.add(a.left.type().name);			
-			dettagli.add("genitore"); // da fare
+			dettagli.add(a.left.type().name);
+			if (a.left.eContainer().isDefined() ) 						
+				dettagli.add(a.left.eContainer().name);
+			else dettagli.add(""); 
 			dettagli.add(a.differences);
 			
 			tuttiTipi.add(dettagli);
@@ -72,7 +74,13 @@ rule Test
 		}
 		
 	}
+	/*
 	
+	"\n\n<< Metamodello in input >>".println();
+	var x1 = SourceMM.allInstances();
+		for (k in x1)			
+			k.println();
+	*/
 	
 	"\n\n<< Informazioni lette nel modello in input >>".println();
 	
@@ -87,5 +95,13 @@ rule Test
 }
 
 
+/* NOTE 
+
+Per ottenere il genitore di un elemento del modello in input (nel caso esista)
+bisogna usare il metodo eContainer() nella forma:
+
+figlio.eContainer();
+
+*/
 
 
