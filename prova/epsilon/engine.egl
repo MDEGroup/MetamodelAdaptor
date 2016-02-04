@@ -1,116 +1,96 @@
 pre {
-"$> Avvio trasformazione\n".println();
+"$> Start migration...\n".println();
 }
 
 post {
-"$> Trasformazione completata\n".println();
+"$> Migration completed.\n".println();
 }
 [%
-
 // scorri le modifiche nel comparatore
 for (comp in Comparison.allInstances()) {	
-	"--- Elenco cambiamenti ---".println();	
-	var listaAggiunti = new Map;
-	var listaRimossi = new Map;
-	var listaUguali = new Map;	
+	"--- List of changes ---".println();	
+	var ms = System.user.confirm('Is source model the right one?', true); 
+	
+	var listaUguali = new Map;   // elementi non modificati
+	var listaAggiunti = new Map; // elementi aggiunti		
+	var listaSpostatiS = new Map;
+	var listaSpostatiD = new Map; // elementi spostati
 	
 	// esplorazione delle modifiche e copia classi uguali
 	for (u in comp.matches)
-		esplora(u, listaAggiunti, listaRimossi, listaUguali);
+		esplora(u, listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD, ms);
 		
-	// generazione classi modificate
-	regolaNuoveClassi(listaAggiunti, listaUguali);	
-	regolaCopiaClassi(listaUguali);
+	// generazione classi modificate		
+	ClassCopyRules(listaUguali);
+	ClassModified(listaAggiunti, listaUguali);
 }
 
-// Esplorazione corrispondenze fra i due metamodelli
-operation esplora(m: Match, a: Map, r: Map, u: Map){
 
-	if (not m.submatches.isEmpty())
-		for (sub in m.submatches) esplora(sub, a, r, u);
-		
-	var sorg = m.right;
-	var dest = m.left;	
+// Esplorazione delle modifiche
+operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean) {
 	
-	// elemento non modificato	
+	// esplorazione in profondità
+	if (not m.submatches.isEmpty())
+		for (sub in m.submatches) esplora(sub, a, u, sps, spd, ms);
+
+	var sorg; var dest;
+	// identificazione sorgente/destinazione
+	if (ms) {	
+		sorg = m.right;
+		dest = m.left;
+	}
+	else {
+		dest = m.right;
+		sorg = m.left;
+	}
+	
+	// elemento non modificato
 	if (m.differences.isEmpty()) {
-		//( sorg.type().name + "[ " + sorg.name + " ] UGUALE @ " + 
-		//  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
 		
-		// Le classi invariate vengono copiate da regole semplici
-		if (sorg.type().name == "EClass") aggiungiCoda(u, CLS_EQU(), sorg.name);
-		
-		// Gli altri elementi invariati vengono aggiunti alla coda di copia
-		else {
-			if (sorg.eContainer().isDefined()) aggiungiCoda(a, sorg.eContainer().name, sorg);		
-		}			
+		// Log
+		( sorg.type().name + "[ " + sorg.name + " ] UGUALE @ " + 
+		  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
+	
+		aggiungiCoda(u, sorg.eContainer(), sorg);
 	}
 	
 	// elemento modificato
-	else {	
-		"".println();								
-		
-		// Caso 1: elemento aggiunto
+	else {
+	
+		// 1 - Aggiunto
 		if ((sorg == null) and (dest <> null)){
 			
-			// Log modifica
+			// Log
 			( dest.type().name + "[ " + dest.name + " ] AGGIUNTO @ " + 
 			  dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
-			  
-			// Traccia modifica
-			// Gli elementi aggiunti vengono messi in coda di copia
-			aggiungiCoda(a, dest.eContainer().name, dest);					
+		
+			aggiungiCoda(a, dest.eContainer(), dest);
 		}
 		
-		// Caso 2: elemento cancellato
-		else if ((sorg <> null) and (dest == null)){
-			
-			// Log modifica
+		// 2 - Rimosso (solo notifica)
+		else if ((sorg <> null ) and (dest == null)) {
+		
+			// Log
 			( sorg.type().name + "[ " + sorg.name + " ] RIMOSSO @ " + 
 			  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
-			  
-			// Traccia modifica
-			// Gli elementi rimossi vengono messi in coda di cancellazione
-			aggiungiCoda(r, sorg.eContainer().name, sorg);			
 		}
 		
-		// Caso 3: elemento spostato
+		// 2 - Spostato
 		else if (sorg.eContainer() <> dest.eContainer()) {
 		
-			// Log modifica
-			( sorg.type().name + "[ " + sorg.name + " ] SPOSTATO").println(); 
-			  ("Da: " + sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();			  
-			  ("A: " + dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
+			// Ignora il cambio di package
+			if (( sorg.eContainer() <> null ) and ( sorg.eContainer().type().name <> 'EPackage' )) {
 			
-			// Traccia modifica
-			// Gli elementi spostati vengono rimossi dalla sorgente...
-			aggiungiCoda(r, sorg.eContainer().name, sorg);
-						
-			// ... e aggiunti alla destinazione
-			aggiungiCoda(a, dest.eContainer().name, dest);						  
+				// Log
+				( sorg.type().name + "[ " + sorg.name + " ] SPOSTATO").println(); 
+				  ("Da: " + sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();			  
+				  ("A: " + dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
+							
+				aggiungiCoda(sps, sorg.eContainer(), sorg);
+				aggiungiCoda(spd, sorg.eContainer(), dest);
+			  
+			}
 		}
-		
-		// Caso 4: elemento modificato
-		else {
-			
-			// Log modifica 
-			if (sorg.eContainer().isDefined())
-				( sorg.type().name + "[ " + sorg.name + " ] MODIFICATO @ " + 
-				  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
-			else 
-				( sorg.type().name + "[ " + sorg.name + " ] MODIFICATO").println();
-			
-			("Precedente: " + sorg).println();
-			("Successivo: " + dest).println();
-			
-			// Traccia modifica
-			// Gli elementi modificati vengono aggiunti alla coda di modifica
-			if (sorg.eContainer().isDefined()) aggiungiCoda(a, dest.eContainer().name, dest);
-		}
-	/*
-	// Debug	
-	a.println();
-	r.println();*/
 	}
 }
 
@@ -127,50 +107,243 @@ operation rimuoviCoda(coda: Map, k: Any, v: Any) {
 	if (coda.containsKey(k)) coda.get(k).remove(v);
 }
 
-// Regole per la copia di classi invariate
-operation regolaCopiaClassi(l1: Map) {	
+operation aggiungiElClasseUguale(coda: Map, classe: Any, el: Any) {
+	if (not coda.containsKey(classe)) { 
+		coda.put(classe, new Map); 
+			coda.get(classe).put('uguali', new Sequence);
+			coda.get(classe).put('aggiunti', new Sequence);
+	}
+	coda.get(classe).get('uguali').add(el);	
+}
 
-	for (c in l1.get( CLS_EQU() )) {	
+operation aggiungiElClasseAggiunto(coda: Map, classe: Any, el: Any) {
+	if (not coda.containsKey(classe)) { 
+		coda.put(classe, new Map); 
+			coda.get(classe).put('uguali', new Sequence);
+			coda.get(classe).put('aggiunti', new Sequence);
+	}
+	coda.get(classe).get('aggiunti').add(el);	
+}
+
+// Regole per la copia di classi invariate
+operation ClassCopyRules(l1: Map) {
+	
+	var chiavi = l1.keySet();
+	for (c in chiavi) 
+	for (cl in l1.get(c)) {
+	
+		if (isClass(cl) and areParentsUnchanged(cl, l1)) {
+		cl.println();	
 %]	
-	// Copia di: [%=c%]	
-	rule Invariato_[%=c%]
-		transform s : Input![%=c%]
-		to d: Output![%=c%] {
+	// The copy of: [%=cl.name%]	
+	rule CopyRule_[%=cl.name%]
+		transform s : Input![%=cl.name%]
+		to d: Output![%=cl.name%] {
 		}		
 [%
+		}
 	}
 }
 
-// Regole per trasformazioni classi con cambiamenti
-operation regolaNuoveClassi(coda: Map, coda2: Map) {
+// Regole per la migrazione di classi modificate
+operation ClassModified(a, u: Map) {
 
-	// raggruppa i cambiamenti per classi
-	var classi = coda.keySet();	
-	for (c in classi) {		
-		rimuoviCoda(coda2, CLS_EQU(), c);
+	// creo una mappa degli attributi, divisi fra uguali ed aggiunti, raggruppati per classi
+	var classi = new Map;
+	var classi2 = new Map;	
+	
+	// arrangio gli elementi invariati
+	var chiavi = u.keySet();
+	for (c in chiavi) 
+	for (el in u.get(c)) 
+		if ( isAttribute(el) or isReference(el) ) { 
+			aggiungiElClasseUguale(classi, el.eContainer().name, el);
+			classi2.put(el.eContainer().name, el.eContainer()); 
+		}  
+	
+	// arrangio gli elementi aggiunti
+	var chiavi = a.keySet();
+	for (c in chiavi) 
+	for (el in a.get(c)) 
+		if ( isAttribute(el) or isReference(el) ) { 
+			aggiungiElClasseAggiunto(classi, el.eContainer().name, el);
+			classi2.put(el.eContainer().name, el.eContainer()); 
+		}
+	
+	// Ora creo le regole, classe per classe
+	var chiavi = classi.keySet();
+	for (c in chiavi) {
+	
+	// intestazione regola
 %]	
-	// Modifica di: [%=c%] 
-	rule Modificata_[%=c%]
+	// The modified: [%=c%] 
+	rule ModifyRule_[%=c%]
 		transform s: Input![%=c%]
 		to d: Output![%=c%] {
 		
 [%	
-			for (a in coda.get(c)) {
-				if (a.type().name == 'EAttribute') {
-%]			d.[%=a.name%] = ''; // viene chiesto all'utente un valore di inizializzazione
-[%			}
-				else if (a.type().name == 'EReference') {
-%]			d.[%=a.name%] = s.[%=a.name%].equivalent();
+
+	// elenco elementi classi genitori uguali
+	for (a1 in listParentsElUguali(classi2.get(c), classi, 0) ) {
+		
+		if ( isAttribute(a1) ) {
+		// attributi
+%]			d.[%=a1.name%] = s.[%=a1.name%];
 [%
-				}
-			}
-%]
 		}
-[%			
+		
+		if ( isReference(a1) ) {
+		// reference
+%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
+[%
+		}	
 	}
+	
+
+	// elenco migrazione attributi invariati
+	for (a1 in classi.get(c).get('uguali')){
+	
+		if ( isAttribute(a1) ) {
+		// attributi
+%]			d.[%=a1.name%] = s.[%=a1.name%];
+[%
+		}
+		
+		if ( isReference(a1) ) {
+		// reference
+%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
+[%
+		}	
+	}
+	
+	
+	// elenco elementi classi genitori aggiunti
+	for (a1 in listParentsElAggiunti(classi2.get(c), classi, 0) ) {
+		
+		if ( isAttribute(a1) ) {
+		// attributi
+			// stringa
+			if (a1.EType.name == 'EString') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string):'); // requesting initial value
+[%			}	
+
+			// carattere
+			else if (a1.EType.name == 'EChar') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char):').charAt(0); // requesting initial value
+[%			}				
+					
+			// intero
+			else if (a1.EType.name == 'EInt') {
+%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer):'); // requesting initial value
+[%			}
+
+			// reale
+			else if (a1.EType.name == 'EFloat') {
+%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real):'); // requesting initial value
+[%			}		
+		}
+		
+		if ( isReference(a1) ) {
+		// reference
+	
+		}
+	}	
+	
+	// elenco inserimento nuovi attributi
+	for (a1 in classi.get(c).get('aggiunti')){
+	
+		if ( isAttribute(a1) ) {
+		// attributi
+			// stringa
+			if (a1.EType.name == 'EString') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string):'); // requesting initial value
+[%			}	
+
+			// carattere
+			else if (a1.EType.name == 'EChar') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char):').charAt(0); // requesting initial value
+[%			}				
+					
+			// intero
+			else if (a1.EType.name == 'EInt') {
+%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer):'); // requesting initial value
+[%			}
+
+			// reale
+			else if (a1.EType.name == 'EFloat') {
+%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real):'); // requesting initial value
+[%			}		
+		}
+		
+		if ( isReference(a1) ) {
+		// reference
+	
+		}
+	}
+	
+	// coda della regola
+%]
+	}
+[%
+
+
+
+	}
+	
+
+}
+
+
+operation listParentsElUguali(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
+	
+	var lista = new Sequence;
+	if (prof > 0) {
+		lista.addAll(c2.get(c1.name).get('uguali'));		
+	}	
+	
+	for (p in c1.getESuperTypes() )
+		lista.addAll(listParentsElUguali(p, c2, prof + 1));
+		
+	return lista;
+}
+
+operation listParentsElAggiunti(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
+	
+	var lista = new Sequence;
+	if (prof > 0) {		
+		lista.addAll(c2.get(c1.name).get('aggiunti'));
+	}	
+	
+	for (p in c1.getESuperTypes() )
+		lista.addAll(listParentsElAggiunti(p, c2, prof + 1));
+		
+	return lista;
+}
+
+
+// Operazioni di controllo
+operation isClass (c: Any): Boolean { // E' una classe
+	return (c.type().name == 'EClass');
+}
+
+operation isAttribute (c: Any): Boolean { // E' un attributo
+	return (c.type().name == 'EAttribute');
+}
+
+operation isReference (c: Any): Boolean { // E' una referenza
+	return (c.type().name == 'EReference');
+}
+
+
+operation areParentsUnchanged(c: Any, l1: Map): Boolean { // I genitori non sono stati modificati
+	var res = false;		
+	for (p in c.getESuperTypes() )
+		res = areParentsUnchanged(p, l1);
+		
+	if (l1.containsValue(c)) return (true and res);
+	else return false;	
 }
 
 // Dichiarazioni di espressioni costanti
 operation CLS_EQU() { return 'classiUguali';}
-
 %]

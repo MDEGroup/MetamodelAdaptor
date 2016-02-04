@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="ASCII"?>
-<famiglia:Famiglia xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:famiglia="univaq.it/famiglia" xsi:schemaLocation="univaq.it/famiglia /prova/model/prova.ecore">
-  <padre nome="Mario Rossi"/>
-  <madre nome="Ginevra Biro"/>
-  <figli nome="Giovanni Rossi"/>
-</famiglia:Famiglia>
