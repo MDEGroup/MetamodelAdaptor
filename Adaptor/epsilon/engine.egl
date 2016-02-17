@@ -8,7 +8,7 @@ post {
 [%
 // scorri le modifiche nel comparatore
 for (comp in Comparison.allInstances()) {	
-	"--- List of changes ---".println();	
+	"--- List of changes ---".println();
 	var ms = System.user.confirm('Is source model the right one?', true); 
 	
 	var listaUguali = new Map;   // elementi non modificati
@@ -23,6 +23,8 @@ for (comp in Comparison.allInstances()) {
 	// generazione classi modificate		
 	ClassCopyRules(listaUguali);
 	ClassModified(listaAggiunti, listaUguali);
+	
+	CLS_LIST_METHOD();
 }
 
 
@@ -179,120 +181,35 @@ operation ClassModified(a, u: Map) {
 	// The modified: [%=c%] 
 	rule ModifyRule_[%=c%]
 		transform s: Input![%=c%]
-		to d: Output![%=c%] {
+		to d: Output![%=c%] {		
+				
+		var clChoiceList = cListCl();
+		var classData1 = clChoiceList.selectOne(c:Input![%=c%] | true);
 		
 [%	
 
 	// elenco elementi classi genitori uguali
-	for (a1 in listParentsElUguali(classi2.get(c), classi, 0) ) {
-		
-		if ( isAttribute(a1) ) {
-		// attributi
-%]			d.[%=a1.name%] = s.[%=a1.name%];
-[%
-		}
-		
-		if ( isReference(a1) ) {
-		// reference
-%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
-[%
-		}	
-	}
-	
+	for (a1 in listParentsElUguali(classi2.get(c), classi, 0) ) 
+		copyOldValues(a1);
 
 	// elenco migrazione attributi invariati
-	for (a1 in classi.get(c).get('uguali')){
-	
-		if ( isAttribute(a1) ) {
-		// attributi
-%]			d.[%=a1.name%] = s.[%=a1.name%];
-[%
-		}
-		
-		if ( isReference(a1) ) {
-		// reference
-%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
-[%
-		}	
-	}
-	
+	for (a1 in classi.get(c).get('uguali'))
+		copyOldValues(a1);
 	
 	// elenco elementi classi genitori aggiunti
-	for (a1 in listParentsElAggiunti(classi2.get(c), classi, 0) ) {
-		
-		if ( isAttribute(a1) ) {
-		// attributi
-			// stringa
-			if (a1.EType.name == 'EString') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string):'); // requesting initial value
-[%			}	
-
-			// carattere
-			else if (a1.EType.name == 'EChar') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char):').charAt(0); // requesting initial value
-[%			}				
-					
-			// intero
-			else if (a1.EType.name == 'EInt') {
-%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer):'); // requesting initial value
-[%			}
-
-			// reale
-			else if (a1.EType.name == 'EFloat') {
-%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real):'); // requesting initial value
-[%			}		
-		}
-		
-		if ( isReference(a1) ) {
-		// reference
-	
-		}
-	}	
+	for (a1 in listParentsElAggiunti(classi2.get(c), classi, 0) ) 
+		askForInitValue(a1);	
 	
 	// elenco inserimento nuovi attributi
-	for (a1 in classi.get(c).get('aggiunti')){
-	
-		if ( isAttribute(a1) ) {
-		// attributi
-			// stringa
-			if (a1.EType.name == 'EString') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string):'); // requesting initial value
-[%			}	
-
-			// carattere
-			else if (a1.EType.name == 'EChar') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char):').charAt(0); // requesting initial value
-[%			}				
-					
-			// intero
-			else if (a1.EType.name == 'EInt') {
-%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer):'); // requesting initial value
-[%			}
-
-			// reale
-			else if (a1.EType.name == 'EFloat') {
-%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real):'); // requesting initial value
-[%			}		
-		}
-		
-		if ( isReference(a1) ) {
-		// reference
-	
-		}
-	}
+	for (a1 in classi.get(c).get('aggiunti'))
+		askForInitValue(a1);	
 	
 	// coda della regola
 %]
 	}
 [%
-
-
-
 	}
-	
-
 }
-
 
 operation listParentsElUguali(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
 	
@@ -346,4 +263,56 @@ operation areParentsUnchanged(c: Any, l1: Map): Boolean { // I genitori non sono
 
 // Dichiarazioni di espressioni costanti
 operation CLS_EQU() { return 'classiUguali';}
+operation CLS_LIST_METHOD() {
+%]
+
+// List of all Input Classes
+operation cListCl(): Sequence {	
+	var clChoiceList = new Sequence;
+	var listOfInClasses = Input.allInstances();	
+	for (x in listOfInClasses)
+		clChoiceList.add(x);
+	return clChoiceList;
+}
+[%
+}
+operation askForInitValue(a1: Any) {
+		if ( isAttribute(a1) ) { // attributi
+			// stringa
+			if (a1.EType.name == 'EString') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string) @ Class ' + classData1 + ' :'); // requesting initial value
+[%			}	
+
+			// carattere
+			else if (a1.EType.name == 'EChar') {
+%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char) @ Class ' + classData1 + ' :').charAt(0); // requesting initial value
+[%			}				
+					
+			// intero
+			else if (a1.EType.name == 'EInt') {
+%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer) @ Class ' + classData1 + ' :'); // requesting initial value
+[%			}
+
+			// reale
+			else if (a1.EType.name == 'EFloat') {
+%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real) @ Class ' + classData1 + ' :') ; // requesting initial value
+[%			}		
+		}
+		
+		if ( isReference(a1) ) { // reference
+%]			d.[%=a1.name%] = System.user.choose('Choose the reference for [%=a1.name%] @ Class ' + classData1 + ' :', clChoiceList ).equivalent(); // requesting initial pointer
+[%
+		}
+}
+operation copyOldValues(a1: Any) {
+		if ( isAttribute(a1) ) { // attributi
+%]			d.[%=a1.name%] = s.[%=a1.name%];
+[%
+		}
+		
+		if ( isReference(a1) ) { // reference
+%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
+[%
+		}	
+}
 %]

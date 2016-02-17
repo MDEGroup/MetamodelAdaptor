@@ -37,7 +37,7 @@
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
         <value href="platform:/resource/prova/model/1-output.ecore#//Famiglia/cognome"/>
       </differences>
-      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.1" kind="DELETE">
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.5/@submatches.0/@differences.1" kind="DELETE">
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
         <value href="platform:/resource/prova/model/2-input.ecore#//Famiglia/figlie"/>
       </differences>
@@ -57,6 +57,21 @@
         <left href="platform:/resource/prova/model/1-output.ecore#//Madre/famiglia"/>
         <right href="platform:/resource/prova/model/2-input.ecore#//Madre/famiglia"/>
       </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.2/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/prova/model/1-output.ecore#//Padre"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.2/@differences.0 //@matches.0/@submatches.3/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/prova/model/1-output.ecore#//Padre/moglie"/>
+        </differences>
+        <left href="platform:/resource/prova/model/1-output.ecore#//Madre/marito"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.2/@submatches.1/@differences.0 //@matches.0/@submatches.2/@submatches.1/@differences.1 //@matches.0/@submatches.3/@submatches.1/@differences.1">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/prova/model/1-output.ecore#//Madre/marito"/>
+      </differences>
       <left href="platform:/resource/prova/model/1-output.ecore#//Madre"/>
       <right href="platform:/resource/prova/model/2-input.ecore#//Madre"/>
     </submatches>
@@ -65,6 +80,21 @@
         <left href="platform:/resource/prova/model/1-output.ecore#//Padre/famiglia"/>
         <right href="platform:/resource/prova/model/2-input.ecore#//Padre/famiglia"/>
       </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.3/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/prova/model/1-output.ecore#//Madre"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.2/@differences.0 //@matches.0/@submatches.3/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/prova/model/1-output.ecore#//Madre/marito"/>
+        </differences>
+        <left href="platform:/resource/prova/model/1-output.ecore#//Padre/moglie"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.2/@submatches.1/@differences.1 //@matches.0/@submatches.3/@submatches.1/@differences.0 //@matches.0/@submatches.3/@submatches.1/@differences.1">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/prova/model/1-output.ecore#//Padre/moglie"/>
+      </differences>
       <left href="platform:/resource/prova/model/1-output.ecore#//Padre"/>
       <right href="platform:/resource/prova/model/2-input.ecore#//Padre"/>
     </submatches>
@@ -103,15 +133,24 @@
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eSuperTypes"/>
         <value href="platform:/resource/prova/model/2-input.ecore#//Persona"/>
       </differences>
-      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.0" requiredBy="//@matches.0/@differences.0" kind="DELETE">
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.0 //@matches.0/@submatches.5/@submatches.0/@differences.1" requiredBy="//@matches.0/@differences.0" kind="DELETE">
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
         <value href="platform:/resource/prova/model/2-input.ecore#//Figlia/famiglia"/>
       </differences>
       <right href="platform:/resource/prova/model/2-input.ecore#//Figlia"/>
     </submatches>
-    <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.5/@differences.1 //@matches.0/@submatches.5/@differences.0" kind="DELETE">
+    <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.5/@differences.0 //@matches.0/@submatches.5/@differences.1" kind="DELETE">
       <reference href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
       <value href="platform:/resource/prova/model/2-input.ecore#//Figlia"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED000574000C46616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED0005740016756E697661712E69742F66616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/nsURI"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED000574000C66616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/nsPrefix"/>
     </differences>
     <left href="platform:/resource/prova/model/1-output.ecore#/"/>
     <right href="platform:/resource/prova/model/2-input.ecore#/"/>

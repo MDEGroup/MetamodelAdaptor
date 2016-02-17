@@ -8,10 +8,14 @@
   <eClassifiers xsi:type="ecore:EClass" name="Padre" eSuperTypes="#//Persona">
     <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
         eOpposite="#//Famiglia/padre"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="moglie" eType="#//Madre"
+        eOpposite="#//Madre/marito"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Madre" eSuperTypes="#//Persona">
     <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
         eOpposite="#//Famiglia/madre"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="marito" eType="#//Padre"
+        eOpposite="#//Padre/moglie"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Figlio" eSuperTypes="#//Persona">
     <eStructuralFeatures xsi:type="ecore:EReference" name="famiglia" eType="#//Famiglia"
