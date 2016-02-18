@@ -18,22 +18,22 @@ for (comp in Comparison.allInstances()) {
 	
 	// esplorazione delle modifiche e copia classi uguali
 	for (u in comp.matches)
-		esplora(u, listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD, ms);
+		esplora(u, listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD, ms, comp);
 		
 	// generazione classi modificate		
 	ClassCopyRules(listaUguali);
-	ClassModified(listaAggiunti, listaUguali);
+	ClassModified(listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD);
 	
 	CLS_LIST_METHOD();
 }
 
 
 // Esplorazione delle modifiche
-operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean) {
+operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean, comp: Comparison) {
 	
 	// esplorazione in profondità
 	if (not m.submatches.isEmpty())
-		for (sub in m.submatches) esplora(sub, a, u, sps, spd, ms);
+		for (sub in m.submatches) esplora(sub, a, u, sps, spd, ms, comp);
 
 	var sorg; var dest;
 	// identificazione sorgente/destinazione
@@ -46,18 +46,8 @@ operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean) {
 		sorg = m.left;
 	}
 	
-	// elemento non modificato
-	if (m.differences.isEmpty()) {
-		
-		// Log
-		( sorg.type().name + "[ " + sorg.name + " ] UGUALE @ " + 
-		  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
-	
-		aggiungiCoda(u, sorg.eContainer(), sorg);
-	}
-	
-	// elemento modificato
-	else {
+	// Identificazione modifiche	
+	if ( ( isPackage(sorg) == false ) and ( isPackage(dest) == false ) ) { // Ignora i package
 	
 		// 1 - Aggiunto
 		if ((sorg == null) and (dest <> null)){
@@ -77,23 +67,34 @@ operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean) {
 			  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
 		}
 		
-		// 2 - Spostato
-		else if (sorg.eContainer() <> dest.eContainer()) {
+		// 3 - Spostate classi
+		/*
+		else if ( condizione di controllo ) {
+			Metti il codice qui
+		}		
+		*/		
 		
-			// Ignora il cambio di package
-			if (( sorg.eContainer() <> null ) and ( sorg.eContainer().type().name <> 'EPackage' )) {
-			
-				// Log
-				( sorg.type().name + "[ " + sorg.name + " ] SPOSTATO").println(); 
-				  ("Da: " + sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();			  
-				  ("A: " + dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
-							
-				aggiungiCoda(sps, sorg.eContainer(), sorg);
-				aggiungiCoda(spd, sorg.eContainer(), dest);
-			  
-			}
+		// 4 - Spostati elementi tra classi
+		else if ( not (isClass(sorg) or isClass(dest)) and (areDifferentContainer(sorg, dest)) and thereIsMove(comp.getDifferences(sorg)) ) {
+						
+			// Log
+			( sorg.type().name + "[ " + sorg.name + " ] SPOSTATO").println(); 
+			  ("Da: " + sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();			  
+			  ("A: " + dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
+						
+			aggiungiCoda(sps, sorg.eContainer(), sorg);
+			aggiungiCoda(spd, sorg.eContainer(), dest);		
 		}
-	}
+		
+		// 3 - Elemento non modificato
+		else {
+			// Log			
+			( sorg.type().name + "[ " + sorg.name + " ] UGUALE @ " + 
+			  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
+		
+			aggiungiCoda(u, sorg.eContainer(), sorg);		
+		}
+	}	
 }
 
 // aggiungi elemento ad una coda di operazioni
@@ -114,6 +115,7 @@ operation aggiungiElClasseUguale(coda: Map, classe: Any, el: Any) {
 		coda.put(classe, new Map); 
 			coda.get(classe).put('uguali', new Sequence);
 			coda.get(classe).put('aggiunti', new Sequence);
+			coda.get(classe).put('spostati', new Sequence);			
 	}
 	coda.get(classe).get('uguali').add(el);	
 }
@@ -123,9 +125,22 @@ operation aggiungiElClasseAggiunto(coda: Map, classe: Any, el: Any) {
 		coda.put(classe, new Map); 
 			coda.get(classe).put('uguali', new Sequence);
 			coda.get(classe).put('aggiunti', new Sequence);
+			coda.get(classe).put('spostati', new Sequence);		
 	}
 	coda.get(classe).get('aggiunti').add(el);	
 }
+
+operation aggiungiElClasseSpostato(coda: Map, classe: Any, el: Any) {
+	if (not coda.containsKey(classe)) { 
+		coda.put(classe, new Map); 
+			coda.get(classe).put('uguali', new Sequence);
+			coda.get(classe).put('aggiunti', new Sequence);
+			coda.get(classe).put('spostati', new Sequence);			
+	}
+	coda.get(classe).get('spostati').add(el);	
+}
+
+
 
 // Regole per la copia di classi invariate
 operation ClassCopyRules(l1: Map) {
@@ -148,7 +163,7 @@ operation ClassCopyRules(l1: Map) {
 }
 
 // Regole per la migrazione di classi modificate
-operation ClassModified(a, u: Map) {
+operation ClassModified(a, u, sps, spd: Map) {
 
 	// creo una mappa degli attributi, divisi fra uguali ed aggiunti, raggruppati per classi
 	var classi = new Map;
@@ -171,6 +186,16 @@ operation ClassModified(a, u: Map) {
 			aggiungiElClasseAggiunto(classi, el.eContainer().name, el);
 			classi2.put(el.eContainer().name, el.eContainer()); 
 		}
+		
+	// arrangio gli elementi spostati
+	var chiavi = spd.keySet();
+	for (c in chiavi) 
+	for (el in spd.get(c)) 
+		if ( isAttribute(el) or isReference(el) ) { 
+			aggiungiElClasseSpostato(classi, el.eContainer().name, el);
+			classi2.put(el.eContainer().name, el.eContainer()); 
+		}
+	
 	
 	// Ora creo le regole, classe per classe
 	var chiavi = classi.keySet();
@@ -202,7 +227,15 @@ operation ClassModified(a, u: Map) {
 	
 	// elenco inserimento nuovi attributi
 	for (a1 in classi.get(c).get('aggiunti'))
-		askForInitValue(a1);	
+		askForInitValue(a1);
+		
+	// elenco elementi classi genitori spostati
+	for (a1 in listParentsElSpostati(classi2.get(c), classi, 0) ) 
+		moveInitValue(a1, sps);
+	
+	// elenco elementi spostati
+	for (a1 in classi.get(c).get('spostati'))
+		moveInitValue(a1, sps);
 	
 	// coda della regola
 %]
@@ -237,18 +270,52 @@ operation listParentsElAggiunti(c1, c2 : Any, prof: Integer): Sequence { // Elen
 	return lista;
 }
 
+operation listParentsElSpostati(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
+	
+	var lista = new Sequence;
+	if (prof > 0) {		
+		lista.addAll(c2.get(c1.name).get('spostati'));
+	}	
+	
+	for (p in c1.getESuperTypes() )
+		lista.addAll(listParentsElSpostati(p, c2, prof + 1));
+		
+	return lista;
+}
+
 
 // Operazioni di controllo
 operation isClass (c: Any): Boolean { // E' una classe
-	return (c.type().name == 'EClass');
+	if ( c <> null )
+		return (c.type().name == 'EClass');
+	else return false;
 }
 
 operation isAttribute (c: Any): Boolean { // E' un attributo
-	return (c.type().name == 'EAttribute');
+	if ( c <> null )
+		return (c.type().name == 'EAttribute');
+	else return false;
 }
 
 operation isReference (c: Any): Boolean { // E' una referenza
-	return (c.type().name == 'EReference');
+	if ( c <> null )
+		return (c.type().name == 'EReference');
+	else return false;
+}
+
+operation isPackage (c: Any): Boolean { // E' un package
+	if ( c <> null )
+		return (c.type().name == 'EPackage');
+	else return false;
+}
+
+operation thereIsMove(c: Sequence): Boolean {
+	if (c.selectOne(r: ReferenceChange | r.kind.toString() == 'MOVE' ) <> null) return true;
+	else return false;	
+}
+
+operation areDifferentContainer(c1, c2: Any): Boolean {	 // Sono in contenitori differenti
+	return c1.eContainer() <> c2.eContainer();
 }
 
 
@@ -312,6 +379,31 @@ operation copyOldValues(a1: Any) {
 		
 		if ( isReference(a1) ) { // reference
 %]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
+[%
+		}	
+}
+operation moveInitValue(a1, sps: Any) {
+
+		// Cerca classe sorgente
+		var nomeClasse = "";
+		var chiavi = sps.keySet();
+		for (c in chiavi) 
+		for (el in sps.get(c))
+			if ( el.name == a1.name ) nomeClasse = c.name; 
+
+		// Scelta della sorgente
+%]		var sorgList = Input![%=nomeClasse%].allInstances();
+		var sorgCh = System.user.choose('Choose the source Class for [%=a1.name%] @ Class ' + s + ' : ', sorgList);
+[%
+
+
+		if ( isAttribute(a1) ) { // attributi
+%]			d.[%=a1.name%] = sorgCh.[%=a1.name%];
+[%
+		}
+		
+		if ( isReference(a1) ) { // reference
+%]			d.[%=a1.name%] = sorgCh.[%=a1.name%].equivalent();
 [%
 		}	
 }

@@ -5,7 +5,7 @@
 <booleanAttribute key="fine_grained_profiling" value="false"/>
 <intAttribute key="generateTo" value="2"/>
 <listAttribute key="models">
-<listEntry value="#&#13;&#10;#Wed Feb 17 17:38:16 CET 2016&#13;&#10;isMetamodelFileBased=false&#13;&#10;name=Comp&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=false&#13;&#10;aliases=Comp&#13;&#10;cached=false&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelUri=http\://www.eclipse.org/emf/2002/Ecore,http\://www.eclipse.org/emf/compare&#13;&#10;modelUri=platform\:/resource/prova/emfCompare/comp2.xmi&#13;&#10;type=EMF&#13;&#10;modelFile=/prova/emfCompare/comp2.xmi&#13;&#10;expand=true&#13;&#10;metamodelFile=&#13;&#10;"/>
+<listEntry value="#&#13;&#10;#Thu Feb 18 09:53:00 CET 2016&#13;&#10;isMetamodelFileBased=false&#13;&#10;name=Comp&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=false&#13;&#10;aliases=Comp&#13;&#10;cached=false&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelUri=http\://www.eclipse.org/emf/2002/Ecore,http\://www.eclipse.org/emf/compare&#13;&#10;modelUri=platform\:/resource/prova/emfCompare/comp.xmi&#13;&#10;type=EMF&#13;&#10;modelFile=/prova/emfCompare/comp.xmi&#13;&#10;expand=true&#13;&#10;metamodelFile=&#13;&#10;"/>
 </listAttribute>
 <stringAttribute key="outputFilePath" value="/prova/epsilon/transform.etl"/>
 <booleanAttribute key="produceTrace" value="false"/>

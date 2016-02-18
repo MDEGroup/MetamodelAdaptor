@@ -29,5 +29,6 @@
         eType="#//Figlio" containment="true" eOpposite="#//Figlio/famiglia"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="figlie" upperBound="-1"
         eType="#//Figlia" containment="true" eOpposite="#//Figlia/famiglia"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="indirizzo" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
 </ecore:EPackage>

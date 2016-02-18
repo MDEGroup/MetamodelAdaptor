@@ -110,9 +110,17 @@
         </differences>
         <left href="platform:/resource/prova/model/1-output.ecore#//Persona/sesso"/>
       </submatches>
+      <submatches>
+        <left href="platform:/resource/prova/model/1-output.ecore#//Persona/indirizzo"/>
+        <right href="platform:/resource/prova/model/2-input.ecore#//Famiglia/indirizzo"/>
+      </submatches>
       <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.4/@submatches.1/@differences.0">
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
         <value href="platform:/resource/prova/model/1-output.ecore#//Persona/sesso"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" kind="MOVE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/prova/model/1-output.ecore#//Persona/indirizzo"/>
       </differences>
       <left href="platform:/resource/prova/model/1-output.ecore#//Persona"/>
       <right href="platform:/resource/prova/model/2-input.ecore#//Persona"/>
@@ -133,7 +141,7 @@
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eSuperTypes"/>
         <value href="platform:/resource/prova/model/2-input.ecore#//Persona"/>
       </differences>
-      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.0 //@matches.0/@submatches.5/@submatches.0/@differences.1" requiredBy="//@matches.0/@differences.0" kind="DELETE">
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.0" requiredBy="//@matches.0/@differences.0" kind="DELETE">
         <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
         <value href="platform:/resource/prova/model/2-input.ecore#//Figlia/famiglia"/>
       </differences>
