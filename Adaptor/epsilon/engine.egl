@@ -9,7 +9,9 @@ post {
 // scorri le modifiche nel comparatore
 for (comp in Comparison.allInstances()) {	
 	"--- List of changes ---".println();
-	var ms = System.user.confirm('Is source model the right one?', true); 
+	var ms = System.user.confirm('Left: ' + comp.matchedResources.leftURI + '\n' + 
+								 'Right: ' + comp.matchedResources.rightURI + ' \n' + 
+								 'Is source metamodel the right one?', true); 
 	
 	var listaUguali = new Map;   // elementi non modificati
 	var listaAggiunti = new Map; // elementi aggiunti		
