@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ASCII"?>
+<compare:Comparison xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:compare="http://www.eclipse.org/emf/compare">
+  <matchedResources leftURI="platform:/resource/Adaptor/test/WebApp1.ecore" rightURI="platform:/resource/Adaptor/test/WebApp2.ecore"/>
+  <matches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//PageEl/position"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//PageEl/position"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//PageEl/page"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//PageEl/page"/>
+      </submatches>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//PageEl"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//PageEl"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Page/elements"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Page/elements"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Page/appRef"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Page/appRef"/>
+      </submatches>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Page"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Page"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//App/URL"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//WebApp/URL"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//App/pages"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//WebApp/pages"/>
+      </submatches>
+      <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED0005740003417070">
+        <attribute href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//App"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//WebApp"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Named%20Element/name"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Named%20Element/name"/>
+      </submatches>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Named%20Element"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Named%20Element"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED0005737200116A6176612E6C616E672E496E746567657212E2A0A4F781873802000149000576616C7565787200106A6176612E6C616E672E4E756D62657286AC951D0B94E08B020000787000000000">
+          <attribute href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/lowerBound"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//InputBox/mask"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//InputBox/mask"/>
+      </submatches>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//InputBox"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//InputBox"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.5/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Input/value"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.5/@submatches.0/@differences.0">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/test/WebApp1.ecore#//Input/value"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Input"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Input"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Text/value"/>
+        <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//PageEl/value"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" kind="MOVE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/test/WebApp1.ecore#//Text/value"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Text"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Text"/>
+    </submatches>
+    <submatches>
+      <left href="platform:/resource/Adaptor/test/WebApp1.ecore#//Button"/>
+      <right href="platform:/resource/Adaptor/test/WebApp2.ecore#//Button"/>
+    </submatches>
+    <left href="platform:/resource/Adaptor/test/WebApp1.ecore#/"/>
+    <right href="platform:/resource/Adaptor/test/WebApp2.ecore#/"/>
+  </matches>
+</compare:Comparison>

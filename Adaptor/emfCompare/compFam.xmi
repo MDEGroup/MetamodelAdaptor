@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="ASCII"?>
+<compare:Comparison xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:compare="http://www.eclipse.org/emf/compare">
+  <matchedResources leftURI="platform:/resource/Adaptor/model/famigliaLeft.ecore" rightURI="platform:/resource/Adaptor/model/famigliaRight.ecore"/>
+  <matches>
+    <submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia/cognome"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia/padre"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/padre"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia/madre"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/madre"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia/figli"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/figli"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@differences.0 //@matches.0/@submatches.0/@differences.1" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.5/@differences.1 //@matches.0/@submatches.0/@differences.1" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia/famiglia"/>
+        </differences>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/figlie"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@submatches.0/@differences.0">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia/cognome"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.5/@submatches.0/@differences.1" kind="DELETE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/figlie"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Famiglia"/>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Figlio/famiglia"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlio/famiglia"/>
+      </submatches>
+      <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Figlio"/>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlio"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre/famiglia"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Madre/famiglia"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.2/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.3/@differences.0 //@matches.0/@submatches.2/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre/moglie"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre/marito"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.2/@submatches.1/@differences.0 //@matches.0/@submatches.2/@submatches.1/@differences.1 //@matches.0/@submatches.3/@submatches.1/@differences.1">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre/marito"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre"/>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Madre"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre/famiglia"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Padre/famiglia"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.3/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.3/@differences.0 //@matches.0/@submatches.2/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Madre/marito"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre/moglie"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.2/@submatches.1/@differences.1 //@matches.0/@submatches.3/@submatches.1/@differences.0 //@matches.0/@submatches.3/@submatches.1/@differences.1">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre/moglie"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Padre"/>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Padre"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona/nome"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Persona/nome"/>
+      </submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.4/@differences.0" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="http://www.eclipse.org/emf/2002/Ecore#//EChar"/>
+        </differences>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona/sesso"/>
+      </submatches>
+      <submatches>
+        <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona/indirizzo"/>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/indirizzo"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.4/@submatches.1/@differences.0">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona/sesso"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" kind="MOVE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona/indirizzo"/>
+      </differences>
+      <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#//Persona"/>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Persona"/>
+    </submatches>
+    <submatches>
+      <submatches>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.5/@differences.1" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//ETypedElement/eType"/>
+          <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia"/>
+        </differences>
+        <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@submatches.0/@differences.1 //@matches.0/@submatches.5/@differences.1" kind="CHANGE">
+          <reference href="http://www.eclipse.org/emf/2002/Ecore#//EReference/eOpposite"/>
+          <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Famiglia/figlie"/>
+        </differences>
+        <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia/famiglia"/>
+      </submatches>
+      <differences xsi:type="compare:ReferenceChange" requiredBy="//@matches.0/@differences.0" kind="DELETE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eSuperTypes"/>
+        <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Persona"/>
+      </differences>
+      <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.1 //@matches.0/@submatches.5/@submatches.0/@differences.0 //@matches.0/@submatches.5/@submatches.0/@differences.1" requiredBy="//@matches.0/@differences.0" kind="DELETE">
+        <reference href="http://www.eclipse.org/emf/2002/Ecore#//EClass/eStructuralFeatures"/>
+        <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia/famiglia"/>
+      </differences>
+      <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia"/>
+    </submatches>
+    <differences xsi:type="compare:ReferenceChange" requires="//@matches.0/@submatches.0/@submatches.4/@differences.0 //@matches.0/@submatches.5/@differences.1 //@matches.0/@submatches.5/@differences.0" kind="DELETE">
+      <reference href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
+      <value href="platform:/resource/Adaptor/model/famigliaRight.ecore#//Figlia"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED000574000C46616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED0005740016756E697661712E69742F66616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/nsURI"/>
+    </differences>
+    <differences xsi:type="compare:AttributeChange" kind="CHANGE" value="ACED000574000C66616D69676C69612D6F7574">
+      <attribute href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/nsPrefix"/>
+    </differences>
+    <left href="platform:/resource/Adaptor/model/famigliaLeft.ecore#/"/>
+    <right href="platform:/resource/Adaptor/model/famigliaRight.ecore#/"/>
+  </matches>
+</compare:Comparison>
