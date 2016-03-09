@@ -1,0 +1,56 @@
+[%
+		// Imports
+		import "engine.egl";
+		import "dataStructure.egl";
+		
+		// Pre and Post ETL statements
+%]
+pre {
+"$> Start migration...\n".println();
+}
+
+post {
+"$> Migration completed.\n".println();
+}
+[%
+// MAIN PROCEDURE
+// Creating dynamic Adaptor's rules ( starting from matches in the Comparator )
+	
+for (comp in Comparison.allInstances()) { // if there are more than 1 Comparator (???)	
+	
+	"--- LOG: List of changes ---".println();	
+	comp.matchedResources.leftURI.println('Left: ');
+	comp.matchedResources.rightURI.println('Right: ');
+	"Right -> Left".println('Evolution: ');
+	
+	if ( System.user.confirm("Are you ready to proceed?") ) {	
+	
+		var elementsChanging = DSCreate(); // changes data structure
+		
+		// exploring changes in deep mode
+		for (el in comp.matches)
+			explore(el, comp, elementsChanging);		
+	}
+	else "Interrupted!".println();	
+}
+
+// fixed ETL Code
+%]
+
+// list of all Input Classes
+operation cListCl(): Sequence {	
+	var clChoiceList = new Sequence;
+	var listOfInClasses = Input.allInstances();	
+	for (x in listOfInClasses)
+		clChoiceList.add(x);
+	return clChoiceList;
+}
+
+// filter class list by Type Name
+operation cFilterListCl(tot: Sequence, filterType: String): Sequence {
+	var ris = new Sequence;
+	for (x in tot)
+		if (x.type().name = filterType)
+			ris.add(x);
+	return ris;
+}

@@ -1,0 +1,55 @@
+[%
+// UTILITY
+
+// given Source ad Dest, return a string identifying the class and the owner package		
+operation classIdentification(source, dest): String {
+	if (dest <> null)
+		if (dest.eContainer() <> null)
+			return dest.name + ' @ ' + dest.eContainer().name;
+		else return dest.name;
+	else if (source <> null)
+			if (source.eContainer() <> null)
+				return source.name + ' @ ' + source.eContainer().name;
+			else return source.name;
+	else return 'no name';
+}
+
+// given Source and Dest, return the name of a class not deleted
+operation getUndeletedClassName(source, dest): String {
+	if (dest <> null)
+		return dest.name;	
+	else return '';
+}
+
+// given a Class returns the list of all parent classes (if exists)
+operation listExtensionClassParent(orig): String {
+	if ( not orig.getESuperTypes().isEmpty() ) {		
+		var ris = new Sequence();
+		for (x in orig.getESuperTypes())
+			ris.add('Adapt_' + x.name);
+		return 'extends ' + ris.concat(',');
+	}
+	else return '';	
+}
+
+
+// DATATYPE IDENTIFY
+		
+operation isIntegerAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EInt';
+}
+
+operation isFloatAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EFloat';
+}
+
+operation isCharAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EChar';
+}
+
+operation isStringAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EString';
+}
+
+
+%]

@@ -1,0 +1,121 @@
+[%
+// DATA STRUCTURE
+
+/* 
+	Data structure to sign elements changing
+
+	elementsChanging [Map] -> [{'class', 'attribute', 'reference'} -> list]
+				
+	list [Map] -> [{'add', 'delete', 'move'} -> Sequence]
+
+*/
+		
+// DS constructor
+// NB. The creation for datastructure is Lazy, so only what is used is created!
+operation DSCreate(): Map {
+	var ris = new Map;
+	
+	// Return new empty unstructured data structure	
+	return ris;
+}
+
+// GETTING 
+
+// Get Level 1
+operation Map DSgetClasses(): Map {
+	if ( self.get('class') == null ) self.put('class', new Map);	
+	return self.get('class');
+}
+
+operation Map DSgetAttributes(): Map {
+	if ( self.get('attribute') == null ) self.put('attribute', new Map);	
+	return self.get('attribute');
+}
+
+operation Map DSgetReferences(): Map {
+	if ( self.get('reference') == null ) self.put('reference', new Map);	
+	return self.get('reference');
+}
+
+// Get Level 2
+operation Map DSgetDeleted(): Sequence {
+	if ( self.get('delete') == null ) self.put('delete', new Sequence);
+	return self.get('delete');
+}
+
+operation Map DSgetMoved(): Sequence {
+	if ( self.get('move') == null ) self.put('move', new Sequence);
+	return self.get('move');
+}
+
+operation Map DSgetAdded(): Sequence {
+	if ( self.get('add') == null ) self.put('add', new Sequence);
+	return self.get('add');
+}
+
+// ADDING
+
+// Add Level 2 - Deleted
+operation Map DSaddDeletedClass(cl: Any) {
+	self.DSgetClasses().DSgetDeleted().add(cl);
+}
+
+operation Map DSaddDeletedAttribute(attr: Any) {
+	self.DSgetAttributes().DSgetDeleted().add(attr);
+}
+
+operation Map DSaddDeletedReference(ref: Any) {
+	self.DSgetReferences().DSgetDeleted().add(ref);
+}
+
+// Add Level 2 - Moved
+operation Map DSaddMovedAttribute(attr: Any) {
+	self.DSgetAttributes().DSgetMoved().add(attr);
+}
+
+operation Map DSaddMovedReference(ref: Any) {
+	self.DSgetReferences().DSgetMoved().add(ref);
+}
+
+// Add Level 2 - Added
+operation Map DSaddAddedAttribute(attr: Any) {
+	self.DSgetAttributes().DSgetAdded().add(attr);
+}
+
+operation Map DSaddAddedReference(ref: Any) {
+	self.DSgetReferences().DSgetAdded().add(ref);
+}
+
+// CHECKING
+
+// Check Level 2 - Deletion
+operation Map DSisDeletedClass(cl: Any): Boolean {
+	return ( self.DSgetClasses().DSgetDeleted().selectOne(x: Any | x == cl) <> null );
+}
+
+operation Map DSisDeletedAttribute(attr: Any): Boolean {
+	return ( self.DSgetAttributes().DSgetDeleted().selectOne(x: Any | x == attr) <> null );
+}
+
+operation Map DSisDeletedReference(ref: Any): Boolean {
+	return ( self.DSgetReferences().DSgetDeleted().selectOne(x: Any | x == ref) <> null );
+}
+
+// Check Level 2 - Moving
+operation Map DSisMovedAttribute(attr: Any): Boolean {
+	return ( self.DSgetAttributes().DSgetMoved().selectOne(x: Any | x == attr) <> null );
+}
+
+operation Map DSisMovedReference(ref: Any): Boolean {
+	return ( self.DSgetReferences().DSgetMoved().selectOne(x: Any | x == ref) <> null );
+}
+
+// Check Level 2 - Adding
+operation Map DSisAddedAttribute(attr: Any): Boolean {
+	return ( self.DSgetAttributes().DSgetAdded().selectOne(x: Any | x == attr) <> null );
+}
+
+operation Map DSisAddedReference(ref: Any): Boolean {
+	return ( self.DSgetReferences().DSgetAdded().selectOne(x: Any | x == ref) <> null );
+}
+%]

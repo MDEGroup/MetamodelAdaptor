@@ -1,412 +1,281 @@
-pre {
-"$> Start migration...\n".println();
-}
+[% 	
+	// Imports
+	import "utility.egl";
+	import "dataStructure.egl";
+	import "checking.egl";
+	
 
-post {
-"$> Migration completed.\n".println();
-}
-[%
-// scorri le modifiche nel comparatore
-for (comp in Comparison.allInstances()) {	
-	"--- List of changes ---".println();
-	var ms = System.user.confirm('Left: ' + comp.matchedResources.leftURI + '\n' + 
-								 'Right: ' + comp.matchedResources.rightURI + ' \n' + 
-								 'Is source metamodel the right one?', true); 
+// EXPLORING CHANGES
+
+operation explore(el: Any, comp: Any, elChanging: Map) {
+
+	// setting source and destination models
+	var source = el.right;
+	var dest = el.left;	
 	
-	var listaUguali = new Map;   // elementi non modificati
-	var listaAggiunti = new Map; // elementi aggiunti		
-	var listaSpostatiS = new Map;
-	var listaSpostatiD = new Map; // elementi spostati
+	// inspecting MATCHES	
 	
-	// esplorazione delle modifiche e copia classi uguali
-	for (u in comp.matches)
-		esplora(u, listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD, ms, comp);
+	// PACKAGES
+	if ( isPackageMatch(el) ) {
+				
+		// Identifying Packages
+		"Exploring package changes:".println("\n\t");		
+		source.println("Source: ");
+		dest.println("Destination: ");
 		
-	// generazione classi modificate		
-	ClassCopyRules(listaUguali);
-	ClassModified(listaAggiunti, listaUguali, listaSpostatiS, listaSpostatiD);
+		// Explore the package changes
+		operatePackDiff(el, elChanging);
+		
+		// Explore changes in the package elements			
+		if (not el.submatches.isEmpty())
+			for (subEl in el.submatches) 
+				explore(subEl, comp, elChanging);
+	}
 	
-	CLS_LIST_METHOD();
+	// CLASSES
+	else if ( isClassMatch(el) ) {			
+		
+		// Identifying Class
+		("Class [ " + classIdentification(source, dest) + " ]").println("\n\t");
+		
+		// Ignore DELETED classes
+		if ( not elChanging.DSisDeletedClass(source) ) {
+			
+			// Explore the class changes
+			operateClassDiff(source, el, elChanging);		
+			
+			// write class rule (head)
+			writeDownClassHeadRule( source, dest );
+			
+			// Explore changes in the class elements			
+			if (not el.submatches.isEmpty())
+				for (subEl in el.submatches) 
+					explore(subEl, comp, elChanging);
+					
+			// write class rule (foot)
+			writeDownClassFootRule( source, dest );
+		}
+		else "Ignored DELETED class!".println();
+				
+		"\t--\t--\t--".println(); 	
+	}
+	
+	// ATTRIBUTES
+	else if ( isAttributeMatch(el) ) {
+		
+		// Identifying Attribute		
+			
+		// explore the atribute changes
+		operateAttributeDiff(source, dest, el, elChanging);		 
+	}
+	
+	// REFERENCES
+	else if ( isReferenceMatch(el) ) {
+		
+		// Identifying Reference		
+			
+		// explore the reference changes				
+		operateReferenceDiff(source, dest, el, elChanging);				
+	}
+	
+	// ERROR!
+	else {
+		"I can't recognise what is changed!".println("!!!!!!");
+	}
+}
+
+// CHECKING/ANALYSING CHANGES
+
+// ... package
+operation operatePackDiff(el: Any, elChanging: Map) {
+	for (x in el.differences)
+		switch ( x.type().name ) {			
+			case 'ReferenceChange': 
+				x.value.name.println(x.kind + ' Reference ' + x.value.type().name + ' : ');
+				if ( x.isDeletedElement() and x.isClassElement() )
+					elChanging.DSaddDeletedClass(x.value);
+			
+			case 'AttributeChange' : 
+				x.value.println(x.kind + ' Attribute ' + x.attribute.name + ' : ');
+			
+			default : 
+				x.value.println(x.kind + ' Generic: ');
+		}
+}
+
+// ...classes
+operation operateClassDiff(source, el: Any, elChanging: Map) {
+	
+	// changes
+	for (x in el.differences) {
+		switch ( x.type().name ) {
+			case 'ReferenceChange' :
+			
+				// class attributes
+				if ( x.isAttributeElement() ) { 
+					if ( x.isMovedElement() ) {
+						elChanging.DSaddMovedAttribute(x.value);							
+					}	
+					else if ( x.isAddedElement() ) {
+						elChanging.DSaddAddedAttribute(x.value);
+					}					
+					else if ( x.isDeletedElement() ) {
+						elChanging.DSaddDeletedAttribute(x.value);									
+					}
+				}
+				
+				// class references
+				else if ( x.isReferenceElement() ) { 
+					if ( x.isMovedElement() ) {
+						elChanging.DSaddMovedReference(x.value);							
+					}
+					else if ( x.isAddedElement() ) {
+						elChanging.DSaddAddedReference(x.value);
+					}						
+					else if ( x.isDeletedElement() ) {
+						elChanging.DSaddDeletedReference(x.value);									
+					}
+				}					
+			
+			case 'AttributeChange' :
+				
+			default : 
+				x.value.println(x.kind + ' Generic: ');
+		}			
+	}	
 }
 
 
-// Esplorazione delle modifiche
-operation esplora(m: Match, a, u, sps, spd: Map, ms: Boolean, comp: Comparison) {
-	
-	// esplorazione in profondità
-	if (not m.submatches.isEmpty())
-		for (sub in m.submatches) esplora(sub, a, u, sps, spd, ms, comp);
+// ... attributes
+operation operateAttributeDiff(source, dest, el: Any, elChanging: Map) {
 
-	var sorg; var dest;
-	// identificazione sorgente/destinazione
-	if (ms) {	
-		sorg = m.right;
-		dest = m.left;
+	// operate Attribute adaptation
+	if ( elChanging.DSisDeletedAttribute(source) ) {
+		(source.name + ' > ' + source.getEType().name + ' ( so ignored )').println("DELETED ATTRIBUTE: ");
+	}	
+	else if ( elChanging.DSisMovedAttribute(dest) ) {
+		(dest.name + ' > ' + dest.getEType().name).println("MOVED ATTRIBUTE: ");
+		writeDownAttributeMove( source, dest );
+	}
+	else if ( elChanging.DSisAddedAttribute(dest) ) {
+		(dest.name + ' > ' + dest.getEType().name).println("ADDED ATTRIBUTE: ");
+		writeDownAttributeAdd( source, dest );
 	}
 	else {
-		dest = m.right;
-		sorg = m.left;
-	}
-	
-	// Identificazione modifiche	
-	if ( ( isPackage(sorg) == false ) and ( isPackage(dest) == false ) ) { // Ignora i package
-	
-		// 1 - Aggiunto
-		if ((sorg == null) and (dest <> null)){
-			
-			// Log
-			( dest.type().name + "[ " + dest.name + " ] AGGIUNTO @ " + 
-			  dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
-		
-			aggiungiCoda(a, dest.eContainer(), dest);
-		}
-		
-		// 2 - Rimosso (solo notifica)
-		else if ((sorg <> null ) and (dest == null)) {
-		
-			// Log
-			( sorg.type().name + "[ " + sorg.name + " ] RIMOSSO @ " + 
-			  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
-		}
-		
-		// 3 - Spostate classi
-		/*
-		else if ( condizione di controllo ) {
-			Metti il codice qui
-		}		
-		*/		
-		
-		// 4 - Spostati elementi tra classi
-		else if ( not (isClass(sorg) or isClass(dest)) and (areDifferentContainer(sorg, dest)) and thereIsMove(comp.getDifferences(sorg)) ) {
-						
-			// Log
-			( sorg.type().name + "[ " + sorg.name + " ] SPOSTATO").println(); 
-			  ("Da: " + sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();			  
-			  ("A: " + dest.eContainer.type().name + "[ " + dest.eContainer().name + " ] " ).println();
-						
-			aggiungiCoda(sps, sorg.eContainer(), sorg);
-			aggiungiCoda(spd, sorg.eContainer(), dest);		
-		}
-		
-		// 3 - Elemento non modificato
-		else {
-			// Log			
-			( sorg.type().name + "[ " + sorg.name + " ] UGUALE @ " + 
-			  sorg.eContainer.type().name + "[ " + sorg.eContainer().name + " ] " ).println();
-		
-			aggiungiCoda(u, sorg.eContainer(), sorg);		
-		}
+		(dest.name + ' > ' + dest.getEType().name).println("COPIED ATTRIBUTE: ");
+		writeDownAttributeCopy( source, dest );
 	}	
 }
 
-// aggiungi elemento ad una coda di operazioni
-operation aggiungiCoda(coda: Map, k: Any, v: Any) {
+// ... references
+operation operateReferenceDiff(source, dest, el: Any, elChanging: Map) {
 
-	if (not coda.containsKey(k)) coda.put(k, new Sequence);
-	coda.get(k).add(v);
-}
-
-// rimuovi elemento da una coda di operazioni
-operation rimuoviCoda(coda: Map, k: Any, v: Any) {
-
-	if (coda.containsKey(k)) coda.get(k).remove(v);
-}
-
-operation aggiungiElClasseUguale(coda: Map, classe: Any, el: Any) {
-	if (not coda.containsKey(classe)) { 
-		coda.put(classe, new Map); 
-			coda.get(classe).put('uguali', new Sequence);
-			coda.get(classe).put('aggiunti', new Sequence);
-			coda.get(classe).put('spostati', new Sequence);			
+	// operate Reference adaptation
+	if ( elChanging.DSisDeletedReference(source) ) {
+		(source.name + ' > ' + source.getEType().name + ' ( so ignored )').println("DELETED REFERENCE: ");
 	}
-	coda.get(classe).get('uguali').add(el);	
-}
-
-operation aggiungiElClasseAggiunto(coda: Map, classe: Any, el: Any) {
-	if (not coda.containsKey(classe)) { 
-		coda.put(classe, new Map); 
-			coda.get(classe).put('uguali', new Sequence);
-			coda.get(classe).put('aggiunti', new Sequence);
-			coda.get(classe).put('spostati', new Sequence);		
+	else if ( elChanging.DSisMovedReference(dest) ) {
+		(dest.name + ' > ' + dest.getEType().name).println("MOVED REFERENCE: ");
+		writeDownReferenceMove( source, dest );
 	}
-	coda.get(classe).get('aggiunti').add(el);	
-}
-
-operation aggiungiElClasseSpostato(coda: Map, classe: Any, el: Any) {
-	if (not coda.containsKey(classe)) { 
-		coda.put(classe, new Map); 
-			coda.get(classe).put('uguali', new Sequence);
-			coda.get(classe).put('aggiunti', new Sequence);
-			coda.get(classe).put('spostati', new Sequence);			
+	else if ( elChanging.DSisAddedReference(dest) ) {
+		(dest.name + ' > ' + dest.getEType().name).println("ADDED REFERENCE: ");
+		writeDownReferenceAdd( source, dest );
 	}
-	coda.get(classe).get('spostati').add(el);	
-}
-
-
-
-// Regole per la copia di classi invariate
-operation ClassCopyRules(l1: Map) {
-	
-	var chiavi = l1.keySet();
-	for (c in chiavi) 
-	for (cl in l1.get(c)) {
-	
-		if (isClass(cl) and areParentsUnchanged(cl, l1)) {
-		cl.println();	
-%]	
-	// The copy of: [%=cl.name%]	
-	rule CopyRule_[%=cl.name%]
-		transform s : Input![%=cl.name%]
-		to d: Output![%=cl.name%] {
-		}		
-[%
-		}
+	else {
+		(dest.name + ' > ' + dest.getEType().name).println("COPIED REFERENCE: ");
+		writeDownReferenceCopy( source, dest );
 	}
-}
-
-// Regole per la migrazione di classi modificate
-operation ClassModified(a, u, sps, spd: Map) {
-
-	// creo una mappa degli attributi, divisi fra uguali ed aggiunti, raggruppati per classi
-	var classi = new Map;
-	var classi2 = new Map;	
-	
-	// arrangio gli elementi invariati
-	var chiavi = u.keySet();
-	for (c in chiavi) 
-	for (el in u.get(c)) 
-		if ( isAttribute(el) or isReference(el) ) { 
-			aggiungiElClasseUguale(classi, el.eContainer().name, el);
-			classi2.put(el.eContainer().name, el.eContainer()); 
-		}  
-	
-	// arrangio gli elementi aggiunti
-	var chiavi = a.keySet();
-	for (c in chiavi) 
-	for (el in a.get(c)) 
-		if ( isAttribute(el) or isReference(el) ) { 
-			aggiungiElClasseAggiunto(classi, el.eContainer().name, el);
-			classi2.put(el.eContainer().name, el.eContainer()); 
-		}
 		
-	// arrangio gli elementi spostati
-	var chiavi = spd.keySet();
-	for (c in chiavi) 
-	for (el in spd.get(c)) 
-		if ( isAttribute(el) or isReference(el) ) { 
-			aggiungiElClasseSpostato(classi, el.eContainer().name, el);
-			classi2.put(el.eContainer().name, el.eContainer()); 
-		}
+}
+
+// APPLYING/CODING CHANGES
+
+// ... package
+
+// ... classes
+operation writeDownClassHeadRule(source, dest) {
+	var cName = getUndeletedClassName(source, dest);
+	var cExt = listExtensionClassParent(dest);		
+%]
 	
-	
-	// Ora creo le regole, classe per classe
-	var chiavi = classi.keySet();
-	for (c in chiavi) {
-	
-	// intestazione regola
-%]	
-	// The modified: [%=c%] 
-	rule ModifyRule_[%=c%]
-		transform s: Input![%=c%]
-		to d: Output![%=c%] {		
-				
+	// Adapting class '[%=cName%]' @ package '[%=dest.eContainer().name%]'
+	rule Adapt_[%=cName%]
+	transform s: Input![%=cName%]
+	to d: Output![%=cName%]
+	[%=cExt%]	
+	{	
 		var clChoiceList = cListCl();
-		var classData1 = clChoiceList.selectOne(c:Input![%=c%] | true);
-		
+		var sourceCh;
+		var sourceList;
+	
+[%
+	
+}
+
+operation writeDownClassFootRule(source, dest) {	
+%]
+	}
 [%	
+}
 
-	// elenco elementi classi genitori uguali
-	for (a1 in listParentsElUguali(classi2.get(c), classi, 0) ) 
-		copyOldValues(a1);
-
-	// elenco migrazione attributi invariati
-	for (a1 in classi.get(c).get('uguali'))
-		copyOldValues(a1);
-	
-	// elenco elementi classi genitori aggiunti
-	for (a1 in listParentsElAggiunti(classi2.get(c), classi, 0) ) 
-		askForInitValue(a1);	
-	
-	// elenco inserimento nuovi attributi
-	for (a1 in classi.get(c).get('aggiunti'))
-		askForInitValue(a1);
-		
-	// elenco elementi classi genitori spostati
-	for (a1 in listParentsElSpostati(classi2.get(c), classi, 0) ) 
-		moveInitValue(a1, sps);
-	
-	// elenco elementi spostati
-	for (a1 in classi.get(c).get('spostati'))
-		moveInitValue(a1, sps);
-	
-	// coda della regola
+// ... attributes
+operation writeDownAttributeCopy(source, dest) {
 %]
-	}
+		d.[%=dest.name%] = s.[%=source.name%]; 
+[%
+}
+
+operation writeDownAttributeAdd( source, dest ) {
+	if ( isIntegerAttribute(dest) ) {
+%]
+		d.[%=dest.name%] = System.user.promptInteger('Insert the new ( integer ) value for "[%=dest.name%]" @ class "' + s + '":'); 
 [%
 	}
-}
-
-operation listParentsElUguali(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
-	
-	var lista = new Sequence;
-	if (prof > 0) {
-		lista.addAll(c2.get(c1.name).get('uguali'));		
-	}	
-	
-	for (p in c1.getESuperTypes() )
-		lista.addAll(listParentsElUguali(p, c2, prof + 1));
-		
-	return lista;
-}
-
-operation listParentsElAggiunti(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
-	
-	var lista = new Sequence;
-	if (prof > 0) {		
-		lista.addAll(c2.get(c1.name).get('aggiunti'));
-	}	
-	
-	for (p in c1.getESuperTypes() )
-		lista.addAll(listParentsElAggiunti(p, c2, prof + 1));
-		
-	return lista;
-}
-
-operation listParentsElSpostati(c1, c2 : Any, prof: Integer): Sequence { // Elenco degli elementi dei genitori	
-	
-	var lista = new Sequence;
-	if (prof > 0) {		
-		lista.addAll(c2.get(c1.name).get('spostati'));
-	}	
-	
-	for (p in c1.getESuperTypes() )
-		lista.addAll(listParentsElSpostati(p, c2, prof + 1));
-		
-	return lista;
-}
-
-
-// Operazioni di controllo
-operation isClass (c: Any): Boolean { // E' una classe
-	if ( c <> null )
-		return (c.type().name == 'EClass');
-	else return false;
-}
-
-operation isAttribute (c: Any): Boolean { // E' un attributo
-	if ( c <> null )
-		return (c.type().name == 'EAttribute');
-	else return false;
-}
-
-operation isReference (c: Any): Boolean { // E' una referenza
-	if ( c <> null )
-		return (c.type().name == 'EReference');
-	else return false;
-}
-
-operation isPackage (c: Any): Boolean { // E' un package
-	if ( c <> null )
-		return (c.type().name == 'EPackage');
-	else return false;
-}
-
-operation thereIsMove(c: Sequence): Boolean {
-	if (c.selectOne(r: ReferenceChange | r.kind.toString() == 'MOVE' ) <> null) return true;
-	else return false;	
-}
-
-operation areDifferentContainer(c1, c2: Any): Boolean {	 // Sono in contenitori differenti
-	return c1.eContainer() <> c2.eContainer();
-}
-
-
-operation areParentsUnchanged(c: Any, l1: Map): Boolean { // I genitori non sono stati modificati
-	var res = false;		
-	for (p in c.getESuperTypes() )
-		res = areParentsUnchanged(p, l1);
-		
-	if (l1.containsValue(c)) return (true and res);
-	else return false;	
-}
-
-// Dichiarazioni di espressioni costanti
-operation CLS_EQU() { return 'classiUguali';}
-operation CLS_LIST_METHOD() {
+	else if ( isFloatAttribute(dest) ) {
 %]
-
-// List of all Input Classes
-operation cListCl(): Sequence {	
-	var clChoiceList = new Sequence;
-	var listOfInClasses = Input.allInstances();	
-	for (x in listOfInClasses)
-		clChoiceList.add(x);
-	return clChoiceList;
+		d.[%=dest.name%] = System.user.promptReal('Insert the new ( float ) value for "[%=dest.name%]" @ class "' + s + '":');
+[%
+	}
+	else if ( isCharAttribute(dest) ) {
+%]
+		d.[%=dest.name%] = System.user.prompt('Insert the new ( char ) value for "[%=dest.name%]" @ class "' + s + '":').charAt(0);
+[%
+	}
+	else if ( isStringAttribute(dest) ) {
+%]
+		d.[%=dest.name%] = System.user.prompt('Insert the new ( string ) value for "[%=dest.name%]" @ class "' + s + '":');
+[%
+	}
 }
+
+operation writeDownAttributeMove( source, dest ) {	
+%]
+			sourceList = cFilterListCl(clChoiceList, '[%=source.eContainer().name%]');
+			sourceCh = System.user.choose('Choose the source Class for "[%=dest.name%]" @ Class "' + s + '":', sourceList);
+		d.[%=dest.name%] = sourceCh.[%=source.name%]; 
 [%
 }
-operation askForInitValue(a1: Any) {
-		if ( isAttribute(a1) ) { // attributi
-			// stringa
-			if (a1.EType.name == 'EString') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (string) @ Class ' + classData1 + ' :'); // requesting initial value
-[%			}	
 
-			// carattere
-			else if (a1.EType.name == 'EChar') {
-%]			d.[%=a1.name%] = System.user.prompt('Insert value for [%=a1.name%] (char) @ Class ' + classData1 + ' :').charAt(0); // requesting initial value
-[%			}				
-					
-			// intero
-			else if (a1.EType.name == 'EInt') {
-%]			d.[%=a1.name%] = System.user.promptInteger('Insert value for [%=a1.name%] (integer) @ Class ' + classData1 + ' :'); // requesting initial value
-[%			}
-
-			// reale
-			else if (a1.EType.name == 'EFloat') {
-%]			d.[%=a1.name%] = System.user.promptReal('Insert value for [%=a1.name%] (real) @ Class ' + classData1 + ' :') ; // requesting initial value
-[%			}		
-		}
-		
-		if ( isReference(a1) ) { // reference
-%]			d.[%=a1.name%] = System.user.choose('Choose the reference for [%=a1.name%] @ Class ' + classData1 + ' :', clChoiceList ).equivalent(); // requesting initial pointer
+// ... references
+operation writeDownReferenceCopy(source, dest) {
+%]
+		d.[%=dest.name%] = s.[%=source.name%].equivalent(); 
 [%
-		}
 }
-operation copyOldValues(a1: Any) {
-		if ( isAttribute(a1) ) { // attributi
-%]			d.[%=a1.name%] = s.[%=a1.name%];
+
+operation writeDownReferenceAdd( source, dest ) {	
+%]
+			sourceList = cFilterListCl(clChoiceList, '[%=dest.getEType().name%]');
+		d.[%=dest.name%] = System.user.choose('Choose the new reference for "[%=dest.name%]" @ Class "' + s + '":', sourceList ).equivalent();
 [%
-		}
-		
-		if ( isReference(a1) ) { // reference
-%]			d.[%=a1.name%] = s.[%=a1.name%].equivalent();
-[%
-		}	
 }
-operation moveInitValue(a1, sps: Any) {
 
-		// Cerca classe sorgente
-		var nomeClasse = "";
-		var chiavi = sps.keySet();
-		for (c in chiavi) 
-		for (el in sps.get(c))
-			if ( el.name == a1.name ) nomeClasse = c.name; 
-
-		// Scelta della sorgente
-%]		var sorgList = Input![%=nomeClasse%].allInstances();
-		var sorgCh = System.user.choose('Choose the source Class for [%=a1.name%] @ Class ' + s + ' : ', sorgList);
+operation writeDownReferenceMove( source, dest ) {
+%]
+			sourceList = cFilterListCl(clChoiceList, '[%=source.eContainer().name%]');
+			sourceCh = System.user.choose('Choose the source Class for "[%=dest.name%]" @ Class "' + s + '":', sourceList);
+		d.[%=dest.name%] = sourceCh.[%=source.name%].equivalent(); 
 [%
-
-
-		if ( isAttribute(a1) ) { // attributi
-%]			d.[%=a1.name%] = sorgCh.[%=a1.name%];
-[%
-		}
-		
-		if ( isReference(a1) ) { // reference
-%]			d.[%=a1.name%] = sorgCh.[%=a1.name%].equivalent();
-[%
-		}	
 }
 %]

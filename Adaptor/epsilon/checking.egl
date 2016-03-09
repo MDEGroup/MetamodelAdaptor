@@ -1,0 +1,48 @@
+[%
+// DIFFERENCE KIND
+operation Any isAddedElement(): Boolean {
+	return ( self.kind.asString() == 'ADD' );
+}
+
+operation Any isDeletedElement(): Boolean {
+	return ( self.kind.asString() == 'DELETE' );
+}
+
+operation Any isMovedElement(): Boolean {	
+	return ( self.kind.asString() == 'MOVE' );
+}
+
+// (META)MODEL ELEMENT TYPE
+operation Any isClassElement(): Boolean {
+	return ( self.value.type().name.asString() == 'EClass');
+}
+
+operation Any isAttributeElement(): Boolean {
+	return ( self.value.type().name.asString() == 'EAttribute');
+}
+
+operation Any isReferenceElement(): Boolean {
+	return ( self.value.type().name.asString() == 'EReference');
+}
+
+// TYPE OF MATCHING ELEMENT
+operation isPackageMatch(el: Any): Boolean {
+	if ( el.left <> null ) return ( el.left.type().name == 'EPackage' );
+	else if ( el.right <> null ) return ( el.right.type().name == 'EPackage' );
+}
+
+operation isClassMatch(el: Any): Boolean {
+	if ( el.left <> null ) return ( el.left.type().name == 'EClass' );
+	else if ( el.right <> null ) return ( el.right.type().name == 'EClass' );
+}
+
+operation isAttributeMatch(el: Any): Boolean {
+	if ( el.left <> null ) return ( el.left.type().name == 'EAttribute' );
+	else if ( el.right <> null ) return ( el.right.type().name == 'EAttribute' );
+}
+
+operation isReferenceMatch(el: Any): Boolean {
+	if ( el.left <> null ) return ( el.left.type().name == 'EReference' );
+	else if ( el.right <> null ) return ( el.right.type().name == 'EReference' );
+}
+%]
