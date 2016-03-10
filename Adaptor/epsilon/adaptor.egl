@@ -46,11 +46,18 @@ operation cListCl(): Sequence {
 	return clChoiceList;
 }
 
+// search for the first match
+operation Any cFilterType(ft): Boolean {
+	for (x in ft)
+		if ( self.type().name == x ) return true;
+	return false;
+}
+
 // filter class list by Type Name
-operation cFilterListCl(tot: Sequence, filterType: String): Sequence {
+operation cFilterListCl(tot: Sequence, filterTypes: Sequence): Sequence {
 	var ris = new Sequence;
 	for (x in tot)
-		if (x.type().name = filterType)
-			ris.add(x);
+		if ( x.cFilterType(filterTypes) )
+			ris.add(x);		
 	return ris;
 }

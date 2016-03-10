@@ -15,6 +15,7 @@ post {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 		d.cognome = System.user.prompt('Insert the new ( string ) value for "cognome" @ class "' + s + '":');
 		d.padre = s.padre.equivalent(); 
@@ -31,6 +32,7 @@ post {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 		d.famiglia = s.famiglia.equivalent(); 
 	}
@@ -44,10 +46,9 @@ post {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 		d.famiglia = s.famiglia.equivalent(); 
-			sourceList = cFilterListCl(clChoiceList, 'Padre');
-		d.marito = System.user.choose('Choose the new reference for "marito" @ Class "' + s + '":', sourceList ).equivalent();
 	}
 	
 	// Adapting class 'Padre' @ package 'Famiglia-out'
@@ -59,10 +60,16 @@ post {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 		d.famiglia = s.famiglia.equivalent(); 
-			sourceList = cFilterListCl(clChoiceList, 'Madre');
-		d.moglie = System.user.choose('Choose the new reference for "moglie" @ Class "' + s + '":', sourceList ).equivalent();
+			ft = new Sequence;
+			ft.add('Persona');
+			ft.add('Padre');
+			ft.add('Madre');
+			ft.add('Figlio');
+			sourceList = cFilterListCl(clChoiceList, ft);
+		d.prediletti = System.user.chooseMany('Choose the new reference for "prediletti" @ Class "' + s + '":', sourceList ).equivalent();
 	}
 	
 	// Adapting class 'Persona' @ package 'Famiglia-out'
@@ -74,10 +81,12 @@ post {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 		d.nome = s.nome; 
-		d.sesso = System.user.prompt('Insert the new ( char ) value for "sesso" @ class "' + s + '":').charAt(0);
-			sourceList = cFilterListCl(clChoiceList, 'Famiglia');
+			ft = new Sequence;
+			ft.add('Famiglia');
+			sourceList = cFilterListCl(clChoiceList, ft);
 			sourceCh = System.user.choose('Choose the source Class for "indirizzo" @ Class "' + s + '":', sourceList);
 		d.indirizzo = sourceCh.indirizzo; 
 	}
@@ -91,11 +100,18 @@ operation cListCl(): Sequence {
 	return clChoiceList;
 }
 
+// search for the first match
+operation Any cFilterType(ft): Boolean {
+	for (x in ft)
+		if ( self.type().name == x ) return true;
+	return false;
+}
+
 // filter class list by Type Name
-operation cFilterListCl(tot: Sequence, filterType: String): Sequence {
+operation cFilterListCl(tot: Sequence, filterTypes: Sequence): Sequence {
 	var ris = new Sequence;
 	for (x in tot)
-		if (x.type().name = filterType)
-			ris.add(x);
+		if ( x.cFilterType(filterTypes) )
+			ris.add(x);		
 	return ris;
 }

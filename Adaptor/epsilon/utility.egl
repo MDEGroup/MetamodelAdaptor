@@ -32,6 +32,25 @@ operation listExtensionClassParent(orig): String {
 	else return '';	
 }
 
+// given a class create the list of the supertypes
+operation createSubTypesList(cl: Any) {				
+	for (x in cl.eContainer().eContents() ) 				
+		if (searchForSuperType(x, cl)) {
+%]
+			ft.add('[%=x.name%]');
+[%
+		}
+}
+
+operation Any searchForSuperType(cl, st: Any) {	
+	if ( cl.name == st.name ) return true;
+	else {
+		var ris = false;
+		for (x in cl.getESuperTypes() ) 
+			ris = ris or searchForSuperType(x, st);
+		return ris;		
+	}	 
+}
 
 // DATATYPE IDENTIFY
 		

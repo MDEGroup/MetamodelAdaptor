@@ -151,19 +151,25 @@ operation operateAttributeDiff(source, dest, el: Any, elChanging: Map) {
 
 	// operate Attribute adaptation
 	if ( elChanging.DSisDeletedAttribute(source) ) {
-		(source.name + ' > ' + source.getEType().name + ' ( so ignored )').println("DELETED ATTRIBUTE: ");
+		(source.name + ' > ' + source.getEType().name + ' (so ignored)').println("DELETED ATTRIBUTE: ");
 	}	
 	else if ( elChanging.DSisMovedAttribute(dest) ) {
-		(dest.name + ' > ' + dest.getEType().name).println("MOVED ATTRIBUTE: ");
-		writeDownAttributeMove( source, dest );
+		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeMove( source, dest );
+		else "(skipped initial value not required): ".print();
+		
+		(dest.name + ' > ' + dest.getEType().name).println("MOVED ATTRIBUTE: ");		
 	}
-	else if ( elChanging.DSisAddedAttribute(dest) ) {
+	else if ( elChanging.DSisAddedAttribute(dest) ) {		
+		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeAdd( source, dest );
+		else "(skipped initial value not required): ".print();
+		
 		(dest.name + ' > ' + dest.getEType().name).println("ADDED ATTRIBUTE: ");
-		writeDownAttributeAdd( source, dest );
 	}
-	else {
+	else {		
+		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeCopy( source, dest );
+		else "(skipped initial value not required): ".print();
+		
 		(dest.name + ' > ' + dest.getEType().name).println("COPIED ATTRIBUTE: ");
-		writeDownAttributeCopy( source, dest );
 	}	
 }
 
@@ -172,19 +178,25 @@ operation operateReferenceDiff(source, dest, el: Any, elChanging: Map) {
 
 	// operate Reference adaptation
 	if ( elChanging.DSisDeletedReference(source) ) {
-		(source.name + ' > ' + source.getEType().name + ' ( so ignored )').println("DELETED REFERENCE: ");
+		(source.name + ' > ' + source.getEType().name + ' (so ignored)').println("DELETED REFERENCE: ");
 	}
-	else if ( elChanging.DSisMovedReference(dest) ) {
+	else if ( elChanging.DSisMovedReference(dest) ) {		
+		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceMove( source, dest );
+		else "(skipped initial value not required): ".print();
+		
 		(dest.name + ' > ' + dest.getEType().name).println("MOVED REFERENCE: ");
-		writeDownReferenceMove( source, dest );
 	}
-	else if ( elChanging.DSisAddedReference(dest) ) {
+	else if ( elChanging.DSisAddedReference(dest) ) {		
+		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceAdd( source, dest );
+		else "(skipped initial value not required): ".print();
+		
 		(dest.name + ' > ' + dest.getEType().name).println("ADDED REFERENCE: ");
-		writeDownReferenceAdd( source, dest );
 	}
-	else {
+	else {		
+		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceCopy( source, dest );
+		else "(skipped initial value not required): ".print();
+		
 		(dest.name + ' > ' + dest.getEType().name).println("COPIED REFERENCE: ");
-		writeDownReferenceCopy( source, dest );
 	}
 		
 }
@@ -208,6 +220,7 @@ operation writeDownClassHeadRule(source, dest) {
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
+		var ft;
 	
 [%
 	
@@ -226,7 +239,7 @@ operation writeDownAttributeCopy(source, dest) {
 [%
 }
 
-operation writeDownAttributeAdd( source, dest ) {
+operation writeDownAttributeAdd( source, dest ) {	
 	if ( isIntegerAttribute(dest) ) {
 %]
 		d.[%=dest.name%] = System.user.promptInteger('Insert the new ( integer ) value for "[%=dest.name%]" @ class "' + s + '":'); 
@@ -251,29 +264,53 @@ operation writeDownAttributeAdd( source, dest ) {
 
 operation writeDownAttributeMove( source, dest ) {	
 %]
-			sourceList = cFilterListCl(clChoiceList, '[%=source.eContainer().name%]');
+			ft = new Sequence;
+[%
+	createSubTypesList( source.eContainer() );
+%]
+			sourceList = cFilterListCl(clChoiceList, ft);
 			sourceCh = System.user.choose('Choose the source Class for "[%=dest.name%]" @ Class "' + s + '":', sourceList);
 		d.[%=dest.name%] = sourceCh.[%=source.name%]; 
 [%
 }
 
 // ... references
-operation writeDownReferenceCopy(source, dest) {
+operation writeDownReferenceCopy(source, dest) {	
 %]
 		d.[%=dest.name%] = s.[%=source.name%].equivalent(); 
 [%
 }
 
-operation writeDownReferenceAdd( source, dest ) {	
+operation writeDownReferenceAdd( source, dest ) {
+	if  ( dest.isMany() ) {
 %]
-			sourceList = cFilterListCl(clChoiceList, '[%=dest.getEType().name%]');
+			ft = new Sequence;
+[%
+	createSubTypesList( dest.getEType() );
+%]
+			sourceList = cFilterListCl(clChoiceList, ft);
+		d.[%=dest.name%] = System.user.chooseMany('Choose the new reference for "[%=dest.name%]" @ Class "' + s + '":', sourceList ).equivalent();
+[%	
+	}
+	else {		
+%]
+			ft = new Sequence;
+[%
+	createSubTypesList( dest.getEType() );
+%]
+			sourceList = cFilterListCl(clChoiceList, ft);
 		d.[%=dest.name%] = System.user.choose('Choose the new reference for "[%=dest.name%]" @ Class "' + s + '":', sourceList ).equivalent();
 [%
+	}
 }
 
 operation writeDownReferenceMove( source, dest ) {
 %]
-			sourceList = cFilterListCl(clChoiceList, '[%=source.eContainer().name%]');
+			ft = new Sequence;
+[%
+	createSubTypesList( source.eContainer() );
+%]
+			sourceList = cFilterListCl(clChoiceList, ft);
 			sourceCh = System.user.choose('Choose the source Class for "[%=dest.name%]" @ Class "' + s + '":', sourceList);
 		d.[%=dest.name%] = sourceCh.[%=source.name%].equivalent(); 
 [%
