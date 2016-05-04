@@ -154,19 +154,22 @@ operation operateAttributeDiff(source, dest, el: Any, elChanging: Map) {
 		(source.name + ' > ' + source.getEType().name + ' (so ignored)').println("DELETED ATTRIBUTE: ");
 	}	
 	else if ( elChanging.DSisMovedAttribute(dest) ) {
-		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeMove( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownAttributeMove( source, dest );		
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("MOVED ATTRIBUTE: ");		
 	}
 	else if ( elChanging.DSisAddedAttribute(dest) ) {		
-		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeAdd( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownAttributeAdd( source, dest );
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("ADDED ATTRIBUTE: ");
 	}
 	else {		
-		if ( dest.isRequired() or dest.isMany() ) writeDownAttributeCopy( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownAttributeCopy( source, dest );
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("COPIED ATTRIBUTE: ");
@@ -181,19 +184,22 @@ operation operateReferenceDiff(source, dest, el: Any, elChanging: Map) {
 		(source.name + ' > ' + source.getEType().name + ' (so ignored)').println("DELETED REFERENCE: ");
 	}
 	else if ( elChanging.DSisMovedReference(dest) ) {		
-		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceMove( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownReferenceMove( source, dest );
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("MOVED REFERENCE: ");
 	}
 	else if ( elChanging.DSisAddedReference(dest) ) {		
-		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceAdd( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownReferenceAdd( source, dest );
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("ADDED REFERENCE: ");
 	}
 	else {		
-		if ( dest.isRequired() or dest.isMany() ) writeDownReferenceCopy( source, dest );
+		if ( dest.isRequired() or dest.isMany() or
+			System.user.confirm('Requesting the optional ' + dest.type().name + ' [ ' + dest.name + ' ] @ ' + dest.eContainer().name + '?') ) writeDownReferenceCopy( source, dest );
 		else "(skipped initial value not required): ".print();
 		
 		(dest.name + ' > ' + dest.getEType().name).println("COPIED REFERENCE: ");
@@ -208,20 +214,35 @@ operation operateReferenceDiff(source, dest, el: Any, elChanging: Map) {
 // ... classes
 operation writeDownClassHeadRule(source, dest) {
 	var cName = getUndeletedClassName(source, dest);
-	var cExt = listExtensionClassParent(dest);		
-%]
+	var cExt = listExtensionClassParent(dest);
+	var cExtVirtual = listExtensionVirtualClassParent(dest);
 	
+	if (source == null) {
+%]	
+
+	// Adapting non-existent class '[%=cName%]' @ package '[%=dest.eContainer().name%]'
+	operation Adapt_[%=cName%](s, d: Any)	
+	{	
+[%
+	}
+	else {
+%]	
+
 	// Adapting class '[%=cName%]' @ package '[%=dest.eContainer().name%]'
 	rule Adapt_[%=cName%]
 	transform s: Input![%=cName%]
 	to d: Output![%=cName%]
 	[%=cExt%]	
 	{	
+[%	
+	}
+%]
 		var clChoiceList = cListCl();
 		var sourceCh;
 		var sourceList;
 		var ft;
-	
+		
+		[%=cExtVirtual%]
 [%
 	
 }
@@ -260,6 +281,12 @@ operation writeDownAttributeAdd( source, dest ) {
 		d.[%=dest.name%] = System.user.prompt('Insert the new ( string ) value for "[%=dest.name%]" @ class "' + s + '":');
 [%
 	}
+	else if ( isBooleanAttribute(dest) ) {
+%]
+		d.[%=dest.name%] = System.user.confirm('Is the new ( boolean ) value for "[%=dest.name%]" @ class "' + s + '" true?');
+[%
+	}
+	
 }
 
 operation writeDownAttributeMove( source, dest ) {	

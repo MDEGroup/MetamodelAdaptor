@@ -1,0 +1,132 @@
+pre {
+"$> Start migration...\n".println();
+}
+
+post {
+"$> Migration completed.\n".println();
+}
+	
+
+	// Adapting class 'Family' @ package 'familyleft2'
+	rule Adapt_Family
+	transform s: Input!Family
+	to d: Output!Family
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.father = s.father.equivalent(); 
+		d.mother = s.mother.equivalent(); 
+		d.sons = s.sons.equivalent(); 
+		d.daughters = s.daughters.equivalent(); 
+	}
+	
+
+	// Adapting class 'Daughter' @ package 'familyleft2'
+	rule Adapt_Daughter
+	transform s: Input!Daughter
+	to d: Output!Daughter
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		Adapt_Person(s, d);
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting class 'Son' @ package 'familyleft2'
+	rule Adapt_Son
+	transform s: Input!Son
+	to d: Output!Son
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		Adapt_Person(s, d);
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting class 'Mother' @ package 'familyleft2'
+	rule Adapt_Mother
+	transform s: Input!Mother
+	to d: Output!Mother
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		Adapt_Person(s, d);
+		d.address = s.address; 
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting class 'Father' @ package 'familyleft2'
+	rule Adapt_Father
+	transform s: Input!Father
+	to d: Output!Father
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		Adapt_Person(s, d);
+		d.address = s.address; 
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting non-existent class 'Person' @ package 'familyleft2'
+	operation Adapt_Person(s, d: Any)	
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.name = System.user.prompt('Insert the new ( string ) value for "name" @ class "' + s + '":');
+		d.age = System.user.promptInteger('Insert the new ( integer ) value for "age" @ class "' + s + '":'); 
+		d.isMale = System.user.confirm('Is the new ( boolean ) value for "isMale" @ class "' + s + '" true?');
+	}
+
+// list of all Input Classes
+operation cListCl(): Sequence {	
+	var clChoiceList = new Sequence;
+	var listOfInClasses = Input.allInstances();	
+	for (x in listOfInClasses)
+		clChoiceList.add(x);
+	return clChoiceList;
+}
+
+// search for the first match
+operation Any cFilterType(ft): Boolean {
+	for (x in ft)
+		if ( self.type().name == x ) return true;
+	return false;
+}
+
+// filter class list by Type Name
+operation cFilterListCl(tot: Sequence, filterTypes: Sequence): Sequence {
+	var ris = new Sequence;
+	for (x in tot)
+		if ( x.cFilterType(filterTypes) )
+			ris.add(x);		
+	return ris;
+}

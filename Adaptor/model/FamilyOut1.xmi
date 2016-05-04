@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ASCII"?>
+<familyleft1:Family xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:familyleft1="http://familyleft1/1.0" surname="Rossi" location="via Aldo Moro, 1">
+  <father name="Mario Rossi" age="42"/>
+  <mother name="Ginevra Biro" age="40"/>
+  <sons name="Matteo Rossi" age="12" sex="77"/>
+</familyleft1:Family>

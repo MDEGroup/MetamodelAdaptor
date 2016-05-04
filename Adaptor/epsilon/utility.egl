@@ -26,8 +26,23 @@ operation listExtensionClassParent(orig): String {
 	if ( not orig.getESuperTypes().isEmpty() ) {		
 		var ris = new Sequence();
 		for (x in orig.getESuperTypes())
-			ris.add('Adapt_' + x.name);
-		return 'extends ' + ris.concat(',');
+			if (not x.isAbstract() )
+				ris.add('Adapt_' + x.name);
+		if ( ris.isEmpty() ) return '';
+		else return 'extends ' + ris.concat(',');		
+	}
+	else return '';	
+}
+
+// given a Class returns the list of all virtual parent classes (if exists)
+operation listExtensionVirtualClassParent(orig): String {
+	if ( not orig.getESuperTypes().isEmpty() ) {		
+		var ris = new Sequence();
+		for (x in orig.getESuperTypes())
+			if (x.isAbstract() )
+				ris.add('Adapt_' + x.name + '(s, d);');
+		if ( ris.isEmpty() ) return '';
+		else return ris.concat(' ');		
 	}
 	else return '';	
 }
@@ -51,24 +66,4 @@ operation Any searchForSuperType(cl, st: Any) {
 		return ris;		
 	}	 
 }
-
-// DATATYPE IDENTIFY
-		
-operation isIntegerAttribute(attr: Any): Boolean {
-	return attr.getEType().name == 'EInt';
-}
-
-operation isFloatAttribute(attr: Any): Boolean {
-	return attr.getEType().name == 'EFloat';
-}
-
-operation isCharAttribute(attr: Any): Boolean {
-	return attr.getEType().name == 'EChar';
-}
-
-operation isStringAttribute(attr: Any): Boolean {
-	return attr.getEType().name == 'EString';
-}
-
-
 %]

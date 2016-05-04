@@ -5,9 +5,9 @@
 <booleanAttribute key="fine_grained_profiling" value="false"/>
 <intAttribute key="generateTo" value="2"/>
 <listAttribute key="models">
-<listEntry value="#&#13;&#10;#Thu Mar 10 17:29:44 CET 2016&#13;&#10;isMetamodelFileBased=false&#13;&#10;name=Comp&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=false&#13;&#10;aliases=Comp&#13;&#10;cached=false&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelUri=http\://www.eclipse.org/emf/2002/Ecore,http\://www.eclipse.org/emf/compare&#13;&#10;modelUri=platform\:/resource/Adaptor/emfCompare/compFam.xmi&#13;&#10;type=EMF&#13;&#10;modelFile=/Adaptor/emfCompare/compFam.xmi&#13;&#10;expand=true&#13;&#10;metamodelFile=&#13;&#10;"/>
+<listEntry value="#&#13;&#10;#Tue May 03 12:18:27 CEST 2016&#13;&#10;isMetamodelFileBased=false&#13;&#10;name=Comp&#13;&#10;readOnLoad=true&#13;&#10;storeOnDisposal=false&#13;&#10;aliases=Comp&#13;&#10;cached=true&#13;&#10;fileBasedMetamodelUri=&#13;&#10;metamodelUri=http\://www.eclipse.org/emf/compare,http\://www.eclipse.org/emf/2002/Ecore&#13;&#10;modelUri=platform\:/resource/Adaptor/emfCompare/simple.xmi&#13;&#10;type=EMF&#13;&#10;modelFile=/Adaptor/emfCompare/simple.xmi&#13;&#10;expand=true&#13;&#10;metamodelFile=&#13;&#10;"/>
 </listAttribute>
-<stringAttribute key="outputFilePath" value="/Adaptor/epsilon/transform.etl"/>
+<stringAttribute key="outputFilePath" value="/Adaptor/epsilon/transformSimple.etl"/>
 <booleanAttribute key="produceTrace" value="false"/>
 <booleanAttribute key="profile_model_loading" value="false"/>
 <booleanAttribute key="profiling_enabled" value="false"/>

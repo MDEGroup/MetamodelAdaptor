@@ -25,6 +25,27 @@ operation Any isReferenceElement(): Boolean {
 	return ( self.value.type().name.asString() == 'EReference');
 }
 
+// DATATYPE IDENTIFY
+operation isBooleanAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EBoolean';
+}
+		
+operation isIntegerAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EInt';
+}
+
+operation isFloatAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EFloat';
+}
+
+operation isCharAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EChar';
+}
+
+operation isStringAttribute(attr: Any): Boolean {
+	return attr.getEType().name == 'EString';
+}
+
 // TYPE OF MATCHING ELEMENT
 operation isPackageMatch(el: Any): Boolean {
 	if ( el.left <> null ) return ( el.left.type().name == 'EPackage' );

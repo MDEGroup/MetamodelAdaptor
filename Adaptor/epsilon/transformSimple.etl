@@ -1,0 +1,107 @@
+pre {
+"$> Start migration...\n".println();
+}
+
+post {
+"$> Migration completed.\n".println();
+}
+	
+
+	// Adapting class 'Family' @ package 'familyleft1'
+	rule Adapt_Family
+	transform s: Input!Family
+	to d: Output!Family
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.surname = System.user.prompt('Insert the new ( string ) value for "surname" @ class "' + s + '":');
+		d.location = System.user.prompt('Insert the new ( string ) value for "location" @ class "' + s + '":');
+		d.father = s.father.equivalent(); 
+		d.mother = s.mother.equivalent(); 
+		d.sons = s.sons.equivalent(); 
+	}
+	
+
+	// Adapting class 'Son' @ package 'familyleft1'
+	rule Adapt_Son
+	transform s: Input!Son
+	to d: Output!Son
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.name = s.name; 
+		d.age = s.age; 
+		d.sex = System.user.prompt('Insert the new ( char ) value for "sex" @ class "' + s + '":').charAt(0);
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting class 'Mother' @ package 'familyleft1'
+	rule Adapt_Mother
+	transform s: Input!Mother
+	to d: Output!Mother
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.name = s.name; 
+		d.age = s.age; 
+		d.family = s.family.equivalent(); 
+	}
+	
+
+	// Adapting class 'Father' @ package 'familyleft1'
+	rule Adapt_Father
+	transform s: Input!Father
+	to d: Output!Father
+		
+	{	
+		var clChoiceList = cListCl();
+		var sourceCh;
+		var sourceList;
+		var ft;
+		
+		
+		d.name = s.name; 
+		d.age = s.age; 
+		d.family = s.family.equivalent(); 
+	}
+
+// list of all Input Classes
+operation cListCl(): Sequence {	
+	var clChoiceList = new Sequence;
+	var listOfInClasses = Input.allInstances();	
+	for (x in listOfInClasses)
+		clChoiceList.add(x);
+	return clChoiceList;
+}
+
+// search for the first match
+operation Any cFilterType(ft): Boolean {
+	for (x in ft)
+		if ( self.type().name == x ) return true;
+	return false;
+}
+
+// filter class list by Type Name
+operation cFilterListCl(tot: Sequence, filterTypes: Sequence): Sequence {
+	var ris = new Sequence;
+	for (x in tot)
+		if ( x.cFilterType(filterTypes) )
+			ris.add(x);		
+	return ris;
+}
